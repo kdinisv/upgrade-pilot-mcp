@@ -1,6 +1,6 @@
 {
   "name": "upgrade-pilot-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Workflow-oriented MCP server for safer JS/TS stack upgrades and migrations.",
   "type": "module",
   "bin": {
