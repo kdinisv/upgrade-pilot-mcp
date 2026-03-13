@@ -2,106 +2,60 @@
 
 [English](#upgrade-pilot-mcp) | [Русский](#upgrade-pilot-mcp-ru)
 
-Specialized workflow MCP server for safer JavaScript / TypeScript stack upgrades and migrations.
+MCP server that helps AI agents safely upgrade JavaScript / TypeScript projects — from dependency analysis to PR summary generation.
 
-The v1 route covers:
+## Supported packages
 
-- Node.js
-- TypeScript
-- ESLint / Prettier
-- PostCSS / Webpack / Rollup / esbuild / tsup
-- Vite / Vitest / Jest / Mocha
-- Babel / SWC
-- React / React DOM / Next.js
-- React Router / Redux Toolkit / TanStack Query
-- Vue / Nuxt
-- Vue Router / Pinia
-- Astro / SvelteKit / Remix
-- Svelte
-- Tailwind CSS / Storybook
-- Playwright / Cypress
-- Prisma
-- Express / Fastify / Hono / NestJS
-- GraphQL / Socket.IO
-- Mongoose / Drizzle ORM / TypeORM
-- Husky / lint-staged / commitlint
-- Turbo / Nx
-- Axios / Zod / Lodash / RxJS
-- Angular
+**Languages & tooling:** TypeScript, ESLint, Prettier, Babel, SWC
+**Bundlers:** Vite, Webpack, Rollup, esbuild, tsup, PostCSS, Sass
+**Testing:** Vitest, Jest, Mocha, Playwright, Cypress, Storybook, Supertest, MSW
+**Frameworks:** React, Next.js, Vue, Nuxt, Astro, SvelteKit, Remix, Angular, NestJS, Express, Fastify, Hono
+**Data & state:** Prisma, Drizzle ORM, TypeORM, Mongoose, Redux Toolkit, TanStack Query, Pinia, RxJS
+**Networking:** Axios, GraphQL, Socket.IO, Zod
+**Infra & DX:** Turbo, Nx, Husky, lint-staged, commitlint, Tailwind CSS, Lodash
 
-Recognized package families also include `@nestjs/*`, `@storybook/*`, `@remix-run/*`, and `@angular/*`.
-
-The current popular-package expansion is based on a last-month npm downloads snapshot collected on 2026-03-13. The current top coverage includes `postcss`, `typescript`, `esbuild`, `lodash`, `@babel/core`, `zod`, `eslint`, `axios`, `react`, `rollup`, `react-dom`, `rxjs`, `express`, `prettier`, `vite`, `tailwindcss`, `webpack`, `jest`, `vitest`, `playwright`, `react-router`, `next`, `graphql`, `sass`, `redux`, `@tanstack/react-query`, `husky`, `hono`, `@playwright/test`, `@swc/core`, `lint-staged`, `mocha`, `@reduxjs/toolkit`, `storybook`, `socket.io`, `supertest`, `msw`, `turbo`, `vue`, `nx`, `cypress`, `@commitlint/cli`, `fastify`, `drizzle-orm`, `vue-router`, `mongoose`, `tsup`, `typeorm`, `svelte`, and `pinia`.
-
-The server is designed around agent workflow rather than thin API wrapping. It focuses on project fingerprinting, upgrade path detection, breaking-change guidance, targeted deprecation scanning, safe codemod execution, validation, and PR-summary generation.
+Scoped families `@nestjs/*`, `@storybook/*`, `@remix-run/*`, `@angular/*` are recognized automatically.
 
 ## Tools
 
-| Tool                         | Purpose                                                                       |
-| ---------------------------- | ----------------------------------------------------------------------------- |
-| `analyze_project`            | Read package metadata, lockfiles, and config files to fingerprint the project |
-| `detect_upgrade_paths`       | Compute constrained upgrade steps per supported package                       |
-| `find_breaking_changes`      | Attach official migration guides and curated risk areas                       |
-| `scan_repo_for_deprecations` | Find high-signal deprecated patterns in the codebase                          |
-| `generate_upgrade_plan`      | Build a phased, ordered upgrade plan                                          |
-| `apply_safe_codemods`        | Run deterministic codemods allowed by the v1 safety model                     |
-| `validate_upgrade`           | Execute type-check, lint, test, and build commands                            |
-| `write_upgrade_pr_summary`   | Generate a reviewer-friendly markdown summary                                 |
+| Tool                         | Purpose                                                 |
+| ---------------------------- | ------------------------------------------------------- |
+| `analyze_project`            | Fingerprint the project: deps, configs, lockfile, stack |
+| `detect_upgrade_paths`       | Compute safe upgrade steps per package                  |
+| `find_breaking_changes`      | Surface migration guides and risk areas                 |
+| `scan_repo_for_deprecations` | Find deprecated patterns in the codebase                |
+| `generate_upgrade_plan`      | Build a phased upgrade plan                             |
+| `apply_safe_codemods`        | Run deterministic codemods (dry-run by default)         |
+| `validate_upgrade`           | Run type-check, lint, test, build                       |
+| `write_upgrade_pr_summary`   | Generate a reviewer-friendly markdown summary           |
 
 ## Resources
 
-Each resource provides the last successfully generated artifact for the current server session.
+Each URI returns the latest artifact from the current session:
 
 | URI                                 | Content                    |
 | ----------------------------------- | -------------------------- |
 | `upgrade://analysis/latest`         | Project analysis snapshot  |
 | `upgrade://paths/latest`            | Upgrade path results       |
 | `upgrade://breaking-changes/latest` | Breaking change references |
-| `upgrade://findings/latest`         | Deprecation scan findings  |
+| `upgrade://findings/latest`         | Deprecation findings       |
 | `upgrade://plan/latest`             | Upgrade plan               |
 | `upgrade://validation/latest`       | Validation results         |
 | `upgrade://summary/latest`          | PR summary (markdown)      |
 
 ## Prompts
 
-- **plan_upgrade_route** — guide an agent through the safest upgrade workflow
-- **draft_upgrade_pr** — turn upgrade artifacts into a concise PR description
+- **plan_upgrade_route** — walk the agent through a safe upgrade workflow
+- **draft_upgrade_pr** — turn artifacts into a PR description
 
-## Project structure
-
-```
-src/
-├── server.ts                  # MCP server entry point (stdio transport)
-├── types.ts                   # Shared type definitions
-└── lib/
-    ├── analyzer.ts            # Project fingerprinting
-    ├── upgrade-paths.ts       # Version resolution and upgrade steps
-    ├── breaking-changes.ts    # Curated migration guides data
-    ├── deprecation-scanner.ts # Pattern-based deprecation scanning
-    ├── plan-generator.ts      # Plan generation and PR summary
-    ├── codemods.ts            # Safe codemod execution
-    ├── validation.ts          # Type-check, lint, test, build runner
-    └── fs-utils.ts            # File system helpers
-```
-
-## Security posture
-
-- stdio transport only — no HTTP listener in v1
-- default behavior is read-only
-- codemods require explicit `mode: "apply"`
-- validation only executes local scripts from the target repository
-- no remote code execution
-
-## Scripts
+## Setup
 
 ```bash
-npm run dev     # watch mode via tsx
-npm run build   # compile TypeScript to dist/
-npm run check   # type-check without emitting
-npm run start   # run compiled server
+npm install
+npm run build
 ```
 
-## MCP client configuration
+### MCP client configuration
 
 ```json
 {
@@ -114,9 +68,13 @@ npm run start   # run compiled server
 }
 ```
 
-## Status
+## Security
 
-v1 scaffold with a runnable stdio MCP server, contract-aligned tools, prompts, and artifact resources. See [docs/v1-contracts.md](docs/v1-contracts.md) for the full contract specification.
+- stdio transport only — no HTTP listener
+- All operations are read-only by default
+- Codemods require explicit `mode: "apply"`
+- Validation runs only local scripts from the target repo
+- No remote code execution
 
 ---
 
@@ -126,106 +84,60 @@ v1 scaffold with a runnable stdio MCP server, contract-aligned tools, prompts, a
 
 [English](#upgrade-pilot-mcp) | [Русский](#upgrade-pilot-mcp-ru)
 
-Специализированный workflow MCP-сервер для безопасного обновления и миграции JavaScript / TypeScript стеков.
+MCP-сервер, помогающий AI-агентам безопасно обновлять JavaScript / TypeScript проекты — от анализа зависимостей до генерации описания PR.
 
-Маршрут v1 охватывает:
+## Поддерживаемые пакеты
 
-- Node.js
-- TypeScript
-- ESLint / Prettier
-- PostCSS / Webpack / Rollup / esbuild / tsup
-- Vite / Vitest / Jest / Mocha
-- Babel / SWC
-- React / React DOM / Next.js
-- React Router / Redux Toolkit / TanStack Query
-- Vue / Nuxt
-- Vue Router / Pinia
-- Astro / SvelteKit / Remix
-- Svelte
-- Tailwind CSS / Storybook
-- Playwright / Cypress
-- Prisma
-- Express / Fastify / Hono / NestJS
-- GraphQL / Socket.IO
-- Mongoose / Drizzle ORM / TypeORM
-- Husky / lint-staged / commitlint
-- Turbo / Nx
-- Axios / Zod / Lodash / RxJS
-- Angular
+**Языки и тулинг:** TypeScript, ESLint, Prettier, Babel, SWC
+**Сборщики:** Vite, Webpack, Rollup, esbuild, tsup, PostCSS, Sass
+**Тестирование:** Vitest, Jest, Mocha, Playwright, Cypress, Storybook, Supertest, MSW
+**Фреймворки:** React, Next.js, Vue, Nuxt, Astro, SvelteKit, Remix, Angular, NestJS, Express, Fastify, Hono
+**Данные и стейт:** Prisma, Drizzle ORM, TypeORM, Mongoose, Redux Toolkit, TanStack Query, Pinia, RxJS
+**Сеть:** Axios, GraphQL, Socket.IO, Zod
+**Инфра и DX:** Turbo, Nx, Husky, lint-staged, commitlint, Tailwind CSS, Lodash
 
-Дополнительно распознаются семейства пакетов `@nestjs/*`, `@storybook/*`, `@remix-run/*` и `@angular/*`.
+Scoped-семейства `@nestjs/*`, `@storybook/*`, `@remix-run/*`, `@angular/*` распознаются автоматически.
 
-Текущее расширение популярных пакетов основано на снимке monthly downloads из npm за 2026-03-13. В покрытие top-list сейчас входят `postcss`, `typescript`, `esbuild`, `lodash`, `@babel/core`, `zod`, `eslint`, `axios`, `react`, `rollup`, `react-dom`, `rxjs`, `express`, `prettier`, `vite`, `tailwindcss`, `webpack`, `jest`, `vitest`, `playwright`, `react-router`, `next`, `graphql`, `sass`, `redux`, `@tanstack/react-query`, `husky`, `hono`, `@playwright/test`, `@swc/core`, `lint-staged`, `mocha`, `@reduxjs/toolkit`, `storybook`, `socket.io`, `supertest`, `msw`, `turbo`, `vue`, `nx`, `cypress`, `@commitlint/cli`, `fastify`, `drizzle-orm`, `vue-router`, `mongoose`, `tsup`, `typeorm`, `svelte` и `pinia`.
+## Инструменты
 
-Сервер спроектирован вокруг рабочего сценария агента, а не как тонкая обёртка над API. Он решает конкретную дорогую задачу: «обнови проект с минимальным риском, не сломай типы, тесты, конфиг, линтер, билды и CI».
+| Инструмент                   | Назначение                                              |
+| ---------------------------- | ------------------------------------------------------- |
+| `analyze_project`            | Отпечаток проекта: зависимости, конфиги, lockfile, стек |
+| `detect_upgrade_paths`       | Безопасные шаги обновления по каждому пакету            |
+| `find_breaking_changes`      | Migration guides и зоны риска                           |
+| `scan_repo_for_deprecations` | Поиск устаревших паттернов в коде                       |
+| `generate_upgrade_plan`      | Пофазный план обновления                                |
+| `apply_safe_codemods`        | Детерминистические кодмоды (dry-run по умолчанию)       |
+| `validate_upgrade`           | Запуск type-check, lint, тестов и build                 |
+| `write_upgrade_pr_summary`   | Markdown-описание для PR                                |
 
-## Инструменты (tools)
+## Ресурсы
 
-| Инструмент                   | Назначение                                                                                |
-| ---------------------------- | ----------------------------------------------------------------------------------------- |
-| `analyze_project`            | Читает package.json, lockfile, tsconfig и прочие конфиги для построения отпечатка проекта |
-| `detect_upgrade_paths`       | Вычисляет допустимые пути обновления по каждому поддерживаемому пакету                    |
-| `find_breaking_changes`      | Подтягивает официальные migration guides и курированные зоны риска                        |
-| `scan_repo_for_deprecations` | Ищет в коде устаревшие паттерны и опасные места                                           |
-| `generate_upgrade_plan`      | Строит пофазный, упорядоченный план обновления                                            |
-| `apply_safe_codemods`        | Выполняет детерминистические кодмоды, разрешённые моделью безопасности v1                 |
-| `validate_upgrade`           | Запускает type-check, lint, тесты и build                                                 |
-| `write_upgrade_pr_summary`   | Генерирует markdown-описание изменений для PR                                             |
+Каждый URI возвращает последний артефакт текущей сессии:
 
-## Ресурсы (resources)
+| URI                                 | Содержимое                    |
+| ----------------------------------- | ----------------------------- |
+| `upgrade://analysis/latest`         | Снимок анализа проекта        |
+| `upgrade://paths/latest`            | Пути обновления               |
+| `upgrade://breaking-changes/latest` | Breaking changes              |
+| `upgrade://findings/latest`         | Найденные устаревшие паттерны |
+| `upgrade://plan/latest`             | План обновления               |
+| `upgrade://validation/latest`       | Результаты валидации          |
+| `upgrade://summary/latest`          | Саммари для PR (markdown)     |
 
-Каждый ресурс отдаёт последний успешно сгенерированный артефакт текущей сессии сервера.
+## Промпты
 
-| URI                                 | Содержимое                          |
-| ----------------------------------- | ----------------------------------- |
-| `upgrade://analysis/latest`         | Снимок анализа проекта              |
-| `upgrade://paths/latest`            | Результаты расчёта путей обновления |
-| `upgrade://breaking-changes/latest` | Ссылки на breaking changes          |
-| `upgrade://findings/latest`         | Найденные устаревшие паттерны       |
-| `upgrade://plan/latest`             | План обновления                     |
-| `upgrade://validation/latest`       | Результаты валидации                |
-| `upgrade://summary/latest`          | Саммари для PR (markdown)           |
+- **plan_upgrade_route** — проводит агента через безопасный процесс обновления
+- **draft_upgrade_pr** — превращает артефакты в описание PR
 
-## Промпты (prompts)
-
-- **plan_upgrade_route** — проводит агента через безопасный рабочий процесс обновления
-- **draft_upgrade_pr** — превращает артефакты обновления в краткое описание PR
-
-## Структура проекта
-
-```
-src/
-├── server.ts                  # Точка входа MCP-сервера (stdio transport)
-├── types.ts                   # Общие типы
-└── lib/
-    ├── analyzer.ts            # Анализ проекта
-    ├── upgrade-paths.ts       # Разрешение версий и шаги обновления
-    ├── breaking-changes.ts    # Курированные данные миграционных гайдов
-    ├── deprecation-scanner.ts # Сканирование устаревших паттернов
-    ├── plan-generator.ts      # Генерация плана и PR-саммари
-    ├── codemods.ts            # Безопасные кодмоды
-    ├── validation.ts          # Запуск tsc, lint, тестов и build
-    └── fs-utils.ts            # Утилиты файловой системы
-```
-
-## Безопасность
-
-- Только stdio transport — никакого HTTP в v1
-- По умолчанию все операции read-only
-- Кодмоды требуют явного `mode: "apply"`
-- Валидация запускает только локальные скрипты целевого репозитория
-- Никакого удалённого выполнения кода
-
-## Скрипты
+## Установка
 
 ```bash
-npm run dev     # watch-режим через tsx
-npm run build   # компиляция TypeScript в dist/
-npm run check   # проверка типов без генерации файлов
-npm run start   # запуск скомпилированного сервера
+npm install
+npm run build
 ```
 
-## Конфигурация MCP-клиента
+### Конфигурация MCP-клиента
 
 ```json
 {
@@ -238,6 +150,10 @@ npm run start   # запуск скомпилированного сервера
 }
 ```
 
-## Статус
+## Безопасность
 
-v1 scaffold — работающий stdio MCP-сервер с инструментами, промптами и ресурсами артефактов. Полная контрактная спецификация: [docs/v1-contracts.md](docs/v1-contracts.md).
+- Только stdio transport — без HTTP
+- Все операции read-only по умолчанию
+- Кодмоды требуют явный `mode: "apply"`
+- Валидация запускает только локальные скрипты целевого репозитория
+- Никакого удалённого выполнения кода
