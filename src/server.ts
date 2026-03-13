@@ -5,15 +5,15 @@ import type {
   ReadResourceResult,
 } from "@modelcontextprotocol/sdk/types.js";
 import * as z from "zod/v4";
+import { analyzeProject } from "./lib/analyzer.js";
+import { findBreakingChanges } from "./lib/breaking-changes.js";
+import { applySafeCodemods } from "./lib/codemods.js";
+import { scanRepoForDeprecations } from "./lib/deprecation-scanner.js";
 import {
-  analyzeProject,
-  applySafeCodemods,
-  detectUpgradePaths,
-  findBreakingChanges,
   generateUpgradePlan,
-  scanRepoForDeprecations,
   writeUpgradePrSummary,
-} from "./lib/project-analysis.js";
+} from "./lib/plan-generator.js";
+import { detectUpgradePaths } from "./lib/upgrade-paths.js";
 import { validateUpgrade } from "./lib/validation.js";
 
 const artifacts: Record<string, unknown> = {

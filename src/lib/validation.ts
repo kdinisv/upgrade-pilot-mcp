@@ -4,7 +4,7 @@ import {
   type ValidationCommandResult,
   type ValidationKind,
 } from "../types.js";
-import { analyzeProject } from "./project-analysis.js";
+import { analyzeProject } from "./analyzer.js";
 
 function getPackageManagerCommand(packageManager: PackageManager): string {
   const command = packageManager === "unknown" ? "npm" : packageManager;
