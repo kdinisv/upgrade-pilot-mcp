@@ -4,6 +4,7 @@ import {
   type PackageManager,
   type ProjectAnalysis,
   SUPPORTED_PACKAGES,
+  SUPPORTED_PACKAGE_PREFIXES,
 } from "../types.js";
 import {
   findAllExisting,
@@ -51,7 +52,70 @@ const JEST_CANDIDATES = [
   "jest.config.mjs",
 ];
 
+const NEXT_CANDIDATES = [
+  "next.config.ts",
+  "next.config.mts",
+  "next.config.js",
+  "next.config.mjs",
+  "next.config.cjs",
+];
+
 const NUXT_CANDIDATES = ["nuxt.config.ts", "nuxt.config.js", "nuxt.config.mjs"];
+
+const ASTRO_CANDIDATES = [
+  "astro.config.ts",
+  "astro.config.mts",
+  "astro.config.js",
+  "astro.config.mjs",
+  "astro.config.cjs",
+];
+
+const SVELTE_CANDIDATES = [
+  "svelte.config.ts",
+  "svelte.config.js",
+  "svelte.config.mjs",
+  "svelte.config.cjs",
+];
+
+const TAILWIND_CANDIDATES = [
+  "tailwind.config.ts",
+  "tailwind.config.js",
+  "tailwind.config.mjs",
+  "tailwind.config.cjs",
+];
+
+const PLAYWRIGHT_CANDIDATES = [
+  "playwright.config.ts",
+  "playwright.config.js",
+  "playwright.config.mjs",
+  "playwright.config.cjs",
+];
+
+const CYPRESS_CANDIDATES = [
+  "cypress.config.ts",
+  "cypress.config.js",
+  "cypress.config.mjs",
+  "cypress.config.cjs",
+];
+
+const STORYBOOK_CANDIDATES = [
+  ".storybook/main.ts",
+  ".storybook/main.js",
+  ".storybook/main.mts",
+  ".storybook/main.mjs",
+  ".storybook/main.cjs",
+];
+
+const NEST_CANDIDATES = ["nest-cli.json"];
+
+const REMIX_CANDIDATES = [
+  "remix.config.ts",
+  "remix.config.js",
+  "remix.config.mjs",
+  "remix.config.cjs",
+];
+
+const ANGULAR_CANDIDATES = ["angular.json"];
 
 const PRISMA_CANDIDATES = ["prisma/schema.prisma"];
 
@@ -126,6 +190,21 @@ function flattenDependencies(packageJson: PackageJsonShape): DependencyEntry[] {
   return output.sort((left, right) => left.name.localeCompare(right.name));
 }
 
+function hasPackage(names: Set<string>, matcher: string): boolean {
+  if (matcher.endsWith("/")) {
+    return [...names].some((name) => name.startsWith(matcher));
+  }
+
+  return names.has(matcher);
+}
+
+function isSupportedDependency(name: string): boolean {
+  return (
+    SUPPORTED_PACKAGES.includes(name as (typeof SUPPORTED_PACKAGES)[number]) ||
+    SUPPORTED_PACKAGE_PREFIXES.some((prefix) => name.startsWith(prefix))
+  );
+}
+
 function detectStack(
   dependencies: DependencyEntry[],
   configPresence: ConfigPresence,
@@ -141,16 +220,58 @@ function detectStack(
   if (names.has("vitest") || configPresence.vitest.length > 0)
     stack.add("vitest");
   if (names.has("jest") || configPresence.jest.length > 0) stack.add("jest");
+  if (names.has("react") || names.has("react-dom")) stack.add("react");
+  if (names.has("next") || configPresence.next.length > 0) stack.add("next");
   if (names.has("vue")) stack.add("vue");
   if (names.has("nuxt") || configPresence.nuxt.length > 0) stack.add("nuxt");
+  if (names.has("astro") || configPresence.astro.length > 0) stack.add("astro");
+  if (names.has("@sveltejs/kit") || configPresence.svelte.length > 0)
+    stack.add("sveltekit");
   if (
     names.has("prisma") ||
     names.has("@prisma/client") ||
     configPresence.prisma.length > 0
   )
     stack.add("prisma");
+  if (names.has("tailwindcss") || configPresence.tailwind.length > 0)
+    stack.add("tailwindcss");
+  if (
+    names.has("@playwright/test") ||
+    names.has("playwright") ||
+    configPresence.playwright.length > 0
+  ) {
+    stack.add("playwright");
+  }
+  if (names.has("cypress") || configPresence.cypress.length > 0) {
+    stack.add("cypress");
+  }
+  if (
+    names.has("storybook") ||
+    hasPackage(names, "@storybook/") ||
+    configPresence.storybook.length > 0
+  ) {
+    stack.add("storybook");
+  }
   if (names.has("express")) stack.add("express");
   if (names.has("fastify")) stack.add("fastify");
+  if (
+    names.has("@nestjs/core") ||
+    hasPackage(names, "@nestjs/") ||
+    configPresence.nest.length > 0
+  ) {
+    stack.add("nestjs");
+  }
+  if (
+    names.has("@remix-run/react") ||
+    names.has("@remix-run/node") ||
+    hasPackage(names, "@remix-run/") ||
+    configPresence.remix.length > 0
+  ) {
+    stack.add("remix");
+  }
+  if (hasPackage(names, "@angular/") || configPresence.angular.length > 0) {
+    stack.add("angular");
+  }
 
   return [...stack];
 }
@@ -181,8 +302,38 @@ export async function analyzeProject(
     jest: (await findAllExisting(rootPath, JEST_CANDIDATES)).map((filePath) =>
       relativeTo(rootPath, filePath),
     ),
+    next: (await findAllExisting(rootPath, NEXT_CANDIDATES)).map((filePath) =>
+      relativeTo(rootPath, filePath),
+    ),
     nuxt: (await findAllExisting(rootPath, NUXT_CANDIDATES)).map((filePath) =>
       relativeTo(rootPath, filePath),
+    ),
+    astro: (await findAllExisting(rootPath, ASTRO_CANDIDATES)).map((filePath) =>
+      relativeTo(rootPath, filePath),
+    ),
+    svelte: (await findAllExisting(rootPath, SVELTE_CANDIDATES)).map(
+      (filePath) => relativeTo(rootPath, filePath),
+    ),
+    tailwind: (await findAllExisting(rootPath, TAILWIND_CANDIDATES)).map(
+      (filePath) => relativeTo(rootPath, filePath),
+    ),
+    playwright: (await findAllExisting(rootPath, PLAYWRIGHT_CANDIDATES)).map(
+      (filePath) => relativeTo(rootPath, filePath),
+    ),
+    cypress: (await findAllExisting(rootPath, CYPRESS_CANDIDATES)).map(
+      (filePath) => relativeTo(rootPath, filePath),
+    ),
+    storybook: (await findAllExisting(rootPath, STORYBOOK_CANDIDATES)).map(
+      (filePath) => relativeTo(rootPath, filePath),
+    ),
+    nest: (await findAllExisting(rootPath, NEST_CANDIDATES)).map((filePath) =>
+      relativeTo(rootPath, filePath),
+    ),
+    remix: (await findAllExisting(rootPath, REMIX_CANDIDATES)).map((filePath) =>
+      relativeTo(rootPath, filePath),
+    ),
+    angular: (await findAllExisting(rootPath, ANGULAR_CANDIDATES)).map(
+      (filePath) => relativeTo(rootPath, filePath),
     ),
     prisma: (await findAllExisting(rootPath, PRISMA_CANDIDATES)).map(
       (filePath) => relativeTo(rootPath, filePath),
@@ -190,9 +341,8 @@ export async function analyzeProject(
   };
 
   const dependencies = packageJson ? flattenDependencies(packageJson) : [];
-  const supportedDependencySet = new Set<string>(SUPPORTED_PACKAGES);
   const supportedDependencies = dependencies.filter((d) =>
-    supportedDependencySet.has(d.name),
+    isSupportedDependency(d.name),
   );
   const warnings: string[] = [];
 

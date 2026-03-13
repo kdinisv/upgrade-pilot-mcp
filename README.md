@@ -9,12 +9,17 @@ The v1 route covers:
 - Node.js
 - TypeScript
 - ESLint
-- Vite
-- Vitest
-- Vue 3 / Nuxt
+- Vite / Vitest / Jest
+- React / React DOM / Next.js
+- Vue / Nuxt
+- Astro / SvelteKit / Remix
+- Tailwind CSS / Storybook
+- Playwright / Cypress
 - Prisma
-- Express
-- Fastify
+- Express / Fastify / NestJS
+- Angular
+
+Recognized package families also include `@nestjs/*`, `@storybook/*`, `@remix-run/*`, and `@angular/*`.
 
 The server is designed around agent workflow rather than thin API wrapping. It focuses on project fingerprinting, upgrade path detection, breaking-change guidance, targeted deprecation scanning, safe codemod execution, validation, and PR-summary generation.
 
@@ -116,12 +121,17 @@ v1 scaffold with a runnable stdio MCP server, contract-aligned tools, prompts, a
 - Node.js
 - TypeScript
 - ESLint
-- Vite
-- Vitest
-- Vue 3 / Nuxt
+- Vite / Vitest / Jest
+- React / React DOM / Next.js
+- Vue / Nuxt
+- Astro / SvelteKit / Remix
+- Tailwind CSS / Storybook
+- Playwright / Cypress
 - Prisma
-- Express
-- Fastify
+- Express / Fastify / NestJS
+- Angular
+
+Дополнительно распознаются семейства пакетов `@nestjs/*`, `@storybook/*`, `@remix-run/*` и `@angular/*`.
 
 Сервер спроектирован вокруг рабочего сценария агента, а не как тонкая обёртка над API. Он решает конкретную дорогую задачу: «обнови проект с минимальным риском, не сломай типы, тесты, конфиг, линтер, билды и CI».
 

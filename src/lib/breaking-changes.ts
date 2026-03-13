@@ -61,6 +61,49 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
       "Reporter and coverage integrations should be revalidated.",
     ],
   },
+  jest: {
+    packageName: "jest",
+    guides: [
+      {
+        title: "Jest upgrade guide",
+        url: "https://jestjs.io/docs/upgrading-to-jest30",
+      },
+    ],
+    risks: [
+      "Test environment defaults, snapshot output, and matcher behavior can shift across majors.",
+      "Jest upgrades often surface transformer and ts-jest or babel-jest compatibility issues.",
+    ],
+  },
+  react: {
+    packageName: "react",
+    guides: [
+      {
+        title: "React 19 upgrade guide",
+        url: "https://react.dev/blog/2024/04/25/react-19-upgrade-guide",
+      },
+    ],
+    risks: [
+      "Client and server rendering behavior should be validated together with react-dom.",
+      "Third-party component libraries may lag behind new React majors.",
+    ],
+  },
+  next: {
+    packageName: "next",
+    guides: [
+      {
+        title: "Next.js upgrade guide",
+        url: "https://nextjs.org/docs/app/guides/upgrading/version-16",
+      },
+      {
+        title: "Next.js blog",
+        url: "https://nextjs.org/blog",
+      },
+    ],
+    risks: [
+      "Runtime, routing, and caching behavior can change across majors.",
+      "React and react-dom versions should be upgraded in lockstep with Next.js.",
+    ],
+  },
   vue: {
     packageName: "vue",
     guides: [
@@ -85,6 +128,36 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
     risks: [
       "Nuxt upgrades often include runtime and config behavior changes.",
       "Modules and auto-import behavior need targeted validation.",
+    ],
+  },
+  astro: {
+    packageName: "astro",
+    guides: [
+      {
+        title: "Astro upgrade guides",
+        url: "https://docs.astro.build/en/guides/upgrade-to/",
+      },
+      {
+        title: "Astro blog",
+        url: "https://astro.build/blog/",
+      },
+    ],
+    risks: [
+      "Adapter compatibility and content collection behavior should be revalidated.",
+      "Integration packages may require coordinated upgrades with the Astro core.",
+    ],
+  },
+  "@sveltejs/kit": {
+    packageName: "@sveltejs/kit",
+    guides: [
+      {
+        title: "SvelteKit migration guide",
+        url: "https://svelte.dev/docs/kit/migrating-to-sveltekit-2",
+      },
+    ],
+    risks: [
+      "Adapter and deployment targets should be revalidated after a SvelteKit upgrade.",
+      "Vite and Svelte compiler changes can surface as cascading build failures.",
     ],
   },
   prisma: {
@@ -117,6 +190,58 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
       "Generated client changes can cascade into TypeScript compile failures.",
     ],
   },
+  tailwindcss: {
+    packageName: "tailwindcss",
+    guides: [
+      {
+        title: "Tailwind CSS upgrade guide",
+        url: "https://tailwindcss.com/docs/upgrade-guide",
+      },
+    ],
+    risks: [
+      "CSS entrypoints and config conventions can change across Tailwind majors.",
+      "Build pipeline integrations should be revalidated together with PostCSS or Vite plugins.",
+    ],
+  },
+  "@playwright/test": {
+    packageName: "@playwright/test",
+    guides: [
+      {
+        title: "Playwright release notes",
+        url: "https://playwright.dev/docs/release-notes",
+      },
+    ],
+    risks: [
+      "Browser version bumps can cause snapshot and timing regressions.",
+      "CI environment assumptions should be rechecked together with reporter settings.",
+    ],
+  },
+  cypress: {
+    packageName: "cypress",
+    guides: [
+      {
+        title: "Cypress migration guide",
+        url: "https://docs.cypress.io/app/references/migration-guide",
+      },
+    ],
+    risks: [
+      "Bundler, browser support, and component-testing settings can change across majors.",
+      "CI and plugin behavior should be revalidated after any Cypress major bump.",
+    ],
+  },
+  storybook: {
+    packageName: "storybook",
+    guides: [
+      {
+        title: "Storybook migration guide",
+        url: "https://storybook.js.org/docs/migration-guide",
+      },
+    ],
+    risks: [
+      "Builder and framework adapters can require synchronized upgrades.",
+      "Storybook upgrades often surface config drift in addons and preview setup.",
+    ],
+  },
   express: {
     packageName: "express",
     guides: [
@@ -143,7 +268,69 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
       "Type-provider integrations should be checked after the bump.",
     ],
   },
+  nestjs: {
+    packageName: "nestjs",
+    guides: [
+      {
+        title: "NestJS migration guide",
+        url: "https://docs.nestjs.com/migration-guide",
+      },
+    ],
+    risks: [
+      "Decorators, metadata reflection, and platform adapters should be revalidated together.",
+      "NestJS upgrades often span multiple coordinated @nestjs packages.",
+    ],
+  },
+  remix: {
+    packageName: "remix",
+    guides: [
+      {
+        title: "Remix changelog",
+        url: "https://remix.run/docs/en/main/start/changelog",
+      },
+    ],
+    risks: [
+      "Routing and server runtime behavior should be revalidated after upgrades.",
+      "Build tooling and adapter packages may need coordinated version changes.",
+    ],
+  },
+  angular: {
+    packageName: "angular",
+    guides: [
+      {
+        title: "Angular update guide",
+        url: "https://angular.dev/update-guide",
+      },
+    ],
+    risks: [
+      "Angular major upgrades commonly require synchronized framework, CLI, and TypeScript changes.",
+      "Template compilation and builder settings should be revalidated after the bump.",
+    ],
+  },
 };
+
+function getGuideKey(packageName: string): string {
+  if (packageName === "react-dom") {
+    return "react";
+  }
+  if (packageName === "playwright") {
+    return "@playwright/test";
+  }
+  if (packageName === "storybook" || packageName.startsWith("@storybook/")) {
+    return "storybook";
+  }
+  if (packageName.startsWith("@nestjs/")) {
+    return "nestjs";
+  }
+  if (packageName.startsWith("@remix-run/")) {
+    return "remix";
+  }
+  if (packageName.startsWith("@angular/")) {
+    return "angular";
+  }
+
+  return packageName;
+}
 
 export async function findBreakingChanges(
   rootPath = process.cwd(),
@@ -157,7 +344,13 @@ export async function findBreakingChanges(
       : projectAnalysis.supportedDependencies.map((d) => d.name),
   );
 
-  return [...selectedTargets]
+  const guideKeys = new Set(
+    [...selectedTargets]
+      .map((packageName) => getGuideKey(packageName))
+      .filter((packageName) => Boolean(PACKAGE_GUIDES[packageName])),
+  );
+
+  return [...guideKeys]
     .map((packageName) => PACKAGE_GUIDES[packageName])
     .filter((entry): entry is BreakingChangeReference => Boolean(entry))
     .sort((left, right) => left.packageName.localeCompare(right.packageName));

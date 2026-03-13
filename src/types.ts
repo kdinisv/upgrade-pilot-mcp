@@ -3,12 +3,34 @@ export const SUPPORTED_PACKAGES = [
   "eslint",
   "vite",
   "vitest",
+  "jest",
+  "react",
+  "react-dom",
+  "next",
   "vue",
   "nuxt",
+  "astro",
+  "@sveltejs/kit",
   "prisma",
   "@prisma/client",
+  "tailwindcss",
+  "@playwright/test",
+  "playwright",
+  "cypress",
+  "storybook",
   "express",
   "fastify",
+  "@nestjs/core",
+  "@remix-run/react",
+  "@remix-run/node",
+  "@angular/core",
+] as const;
+
+export const SUPPORTED_PACKAGE_PREFIXES = [
+  "@nestjs/",
+  "@storybook/",
+  "@remix-run/",
+  "@angular/",
 ] as const;
 
 export type SupportedPackageName = (typeof SUPPORTED_PACKAGES)[number];
@@ -33,7 +55,17 @@ export interface ConfigPresence {
   vite: string[];
   vitest: string[];
   jest: string[];
+  next: string[];
   nuxt: string[];
+  astro: string[];
+  svelte: string[];
+  tailwind: string[];
+  playwright: string[];
+  cypress: string[];
+  storybook: string[];
+  nest: string[];
+  remix: string[];
+  angular: string[];
   prisma: string[];
 }
 

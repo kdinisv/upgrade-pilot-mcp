@@ -2,15 +2,22 @@
 
 ## Scope
 
-V1 is a workflow MCP for one narrow route:
+V1 is a workflow MCP for popular JS/TS upgrade routes:
 
 - package manager driven Node.js repositories
 - TypeScript present or planned
 - ESLint
-- Vite
-- Vitest
-- Vue 3 or Nuxt
+- Vite, Vitest, Jest
+- React, React DOM, Next.js
+- Vue, Nuxt
+- Astro, SvelteKit, Remix
+- Tailwind CSS, Storybook
+- Playwright, Cypress
 - Prisma
+- Express, Fastify, NestJS
+- Angular
+
+Supported package families also include `@nestjs/*`, `@storybook/*`, `@remix-run/*`, and `@angular/*`.
 
 The server is optimized for low-risk upgrade orchestration, not for generic package intelligence and not for arbitrary code transformation.
 
@@ -39,7 +46,7 @@ Output:
 - package.json metadata
 - scripts
 - dependency snapshot for supported packages
-- config-file presence for TypeScript, ESLint, Vite, Vitest, Jest, Nuxt, Prisma
+- config-file presence for TypeScript, ESLint, Vite, Vitest, Jest, Next, Nuxt, Astro, SvelteKit, Tailwind, Playwright, Cypress, Storybook, Nest, Remix, Angular, Prisma
 - detected stack tags
 - warnings and upgrade readiness notes
 

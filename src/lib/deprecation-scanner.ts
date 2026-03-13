@@ -42,6 +42,17 @@ const DEPRECATION_RULES: PatternRule[] = [
     recommendation: "Verify ESM compatibility before upgrading the toolchain.",
   },
   {
+    ruleId: "tailwind-legacy-directives",
+    packageName: "tailwindcss",
+    severity: "warning",
+    matcher: /@tailwind\s+(base|components|utilities)\s*;/,
+    appliesTo: (relativePath) =>
+      /\.(css|pcss|postcss|scss|sass)$/.test(relativePath),
+    message: "Legacy Tailwind CSS directives detected.",
+    recommendation:
+      'Tailwind CSS v4 prefers @import "tailwindcss"; verify stylesheet and config migration.',
+  },
+  {
     ruleId: "prisma-referential-integrity",
     packageName: "prisma",
     severity: "high",
