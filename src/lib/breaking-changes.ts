@@ -5,6 +5,19 @@ import {
 import { analyzeProject } from "./analyzer.js";
 
 const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
+  postcss: {
+    packageName: "postcss",
+    guides: [
+      {
+        title: "PostCSS releases",
+        url: "https://github.com/postcss/postcss/releases",
+      },
+    ],
+    risks: [
+      "Plugin API and parser expectations can shift across PostCSS majors.",
+      "Build pipeline changes often cascade into Tailwind or bundler integration issues.",
+    ],
+  },
   typescript: {
     packageName: "typescript",
     guides: [
@@ -33,6 +46,58 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
     risks: [
       "ESLint 9 centers flat config and may break legacy config assumptions.",
       "Plugin and parser compatibility must be verified alongside the core upgrade.",
+    ],
+  },
+  prettier: {
+    packageName: "prettier",
+    guides: [
+      {
+        title: "Prettier blog and release notes",
+        url: "https://prettier.io/blog/",
+      },
+    ],
+    risks: [
+      "Formatting output changes can create large diffs and require snapshot or lint updates.",
+      "Plugin compatibility should be checked alongside any Prettier major upgrade.",
+    ],
+  },
+  webpack: {
+    packageName: "webpack",
+    guides: [
+      {
+        title: "Webpack migration guide",
+        url: "https://webpack.js.org/migrate/5/",
+      },
+    ],
+    risks: [
+      "Loader and plugin compatibility is the main risk surface for Webpack upgrades.",
+      "Bundling defaults and dev-server behavior can shift across majors.",
+    ],
+  },
+  rollup: {
+    packageName: "rollup",
+    guides: [
+      {
+        title: "Rollup migration guide",
+        url: "https://rollupjs.org/migration/",
+      },
+    ],
+    risks: [
+      "Plugin compatibility should be verified before any Rollup major bump.",
+      "Output defaults and config semantics can change across versions.",
+    ],
+  },
+  esbuild: {
+    packageName: "esbuild",
+    guides: [
+      {
+        title: "esbuild releases",
+        url: "https://github.com/evanw/esbuild/releases",
+      },
+    ],
+    risks: [
+      "Minification, target, and loader defaults can affect runtime behavior.",
+      "Esbuild upgrades should be validated together with framework-specific adapters.",
     ],
   },
   vite: {
@@ -74,6 +139,45 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
       "Jest upgrades often surface transformer and ts-jest or babel-jest compatibility issues.",
     ],
   },
+  mocha: {
+    packageName: "mocha",
+    guides: [
+      {
+        title: "Mocha releases",
+        url: "https://github.com/mochajs/mocha/releases",
+      },
+    ],
+    risks: [
+      "Node.js support ranges and CLI behavior may change across Mocha majors.",
+      "Reporter and setup-file behavior should be revalidated after upgrades.",
+    ],
+  },
+  babel: {
+    packageName: "babel",
+    guides: [
+      {
+        title: "Babel 8 migration guide",
+        url: "https://babeljs.io/docs/v8-migration",
+      },
+    ],
+    risks: [
+      "Transpilation output and plugin compatibility can shift across Babel majors.",
+      "Jest, webpack, and framework adapters often depend on synchronized Babel changes.",
+    ],
+  },
+  swc: {
+    packageName: "swc",
+    guides: [
+      {
+        title: "SWC releases",
+        url: "https://github.com/swc-project/swc/releases",
+      },
+    ],
+    risks: [
+      "Compiler output and transform behavior should be revalidated after SWC upgrades.",
+      "Framework integrations may pin SWC behavior more tightly than semver suggests.",
+    ],
+  },
   react: {
     packageName: "react",
     guides: [
@@ -85,6 +189,45 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
     risks: [
       "Client and server rendering behavior should be validated together with react-dom.",
       "Third-party component libraries may lag behind new React majors.",
+    ],
+  },
+  "react-router": {
+    packageName: "react-router",
+    guides: [
+      {
+        title: "React Router upgrading guide",
+        url: "https://reactrouter.com/upgrading/v6",
+      },
+    ],
+    risks: [
+      "Data APIs and route configuration semantics can change across major versions.",
+      "Upgrades often require coordinated changes in loaders, actions, and route definitions.",
+    ],
+  },
+  redux: {
+    packageName: "redux",
+    guides: [
+      {
+        title: "Redux migration guide",
+        url: "https://redux.js.org/usage/migrations/migrating-to-modern-redux",
+      },
+    ],
+    risks: [
+      "Store setup, middleware, and typed hooks often need modernization during Redux upgrades.",
+      "Redux Toolkit and legacy Redux code can require different migration paths inside one repo.",
+    ],
+  },
+  "react-query": {
+    packageName: "react-query",
+    guides: [
+      {
+        title: "TanStack Query v5 migration guide",
+        url: "https://tanstack.com/query/latest/docs/framework/react/guides/migrating-to-v5",
+      },
+    ],
+    risks: [
+      "Query defaults and cache behavior can change in ways that look like runtime regressions.",
+      "Hook option signatures and mutation behavior should be retested after upgrades.",
     ],
   },
   next: {
@@ -117,6 +260,32 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
       "Library compatibility matters as much as the framework version itself.",
     ],
   },
+  "vue-router": {
+    packageName: "vue-router",
+    guides: [
+      {
+        title: "Vue Router migration guide",
+        url: "https://router.vuejs.org/guide/migration/",
+      },
+    ],
+    risks: [
+      "Route configuration and navigation guard behavior should be revalidated across majors.",
+      "Vue Router upgrades can require paired changes in app bootstrap and typed route helpers.",
+    ],
+  },
+  pinia: {
+    packageName: "pinia",
+    guides: [
+      {
+        title: "Pinia releases",
+        url: "https://github.com/vuejs/pinia/releases",
+      },
+    ],
+    risks: [
+      "Store hydration and plugin behavior should be revalidated after major upgrades.",
+      "Interoperability with Vue Router and SSR setup should be checked in Nuxt and Vue apps.",
+    ],
+  },
   nuxt: {
     packageName: "nuxt",
     guides: [
@@ -145,6 +314,19 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
     risks: [
       "Adapter compatibility and content collection behavior should be revalidated.",
       "Integration packages may require coordinated upgrades with the Astro core.",
+    ],
+  },
+  svelte: {
+    packageName: "svelte",
+    guides: [
+      {
+        title: "Svelte 5 migration guide",
+        url: "https://svelte.dev/docs/svelte/v5-migration-guide",
+      },
+    ],
+    risks: [
+      "Component API and reactivity semantics can shift across Svelte majors.",
+      "Compiler changes should be validated together with SvelteKit or bundler integrations.",
     ],
   },
   "@sveltejs/kit": {
@@ -188,6 +370,45 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
     risks: [
       "Client and CLI versions should be kept aligned.",
       "Generated client changes can cascade into TypeScript compile failures.",
+    ],
+  },
+  "drizzle-orm": {
+    packageName: "drizzle-orm",
+    guides: [
+      {
+        title: "Drizzle ORM latest releases",
+        url: "https://orm.drizzle.team/docs/latest-releases/drizzle-orm",
+      },
+    ],
+    risks: [
+      "Schema definition and query builder typing should be revalidated after upgrades.",
+      "Driver and migration package versions may need coordinated changes.",
+    ],
+  },
+  mongoose: {
+    packageName: "mongoose",
+    guides: [
+      {
+        title: "Mongoose migration guide",
+        url: "https://mongoosejs.com/docs/migrating_to_8.html",
+      },
+    ],
+    risks: [
+      "Default schema behavior and connection options can change across majors.",
+      "Model typing and query semantics should be revalidated with TypeScript enabled.",
+    ],
+  },
+  typeorm: {
+    packageName: "typeorm",
+    guides: [
+      {
+        title: "TypeORM releases",
+        url: "https://github.com/typeorm/typeorm/releases",
+      },
+    ],
+    risks: [
+      "Data source setup, migrations, and decorator metadata often drift across TypeORM versions.",
+      "Runtime database behavior should be revalidated together with entity typing changes.",
     ],
   },
   tailwindcss: {
@@ -242,6 +463,71 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
       "Storybook upgrades often surface config drift in addons and preview setup.",
     ],
   },
+  husky: {
+    packageName: "husky",
+    guides: [
+      {
+        title: "Husky migration guide",
+        url: "https://typicode.github.io/husky/migrate-from-v4.html",
+      },
+    ],
+    risks: [
+      "Hook installation and repository bootstrap behavior often change across Husky majors.",
+      "CI and local developer environments should both be validated after updates.",
+    ],
+  },
+  "lint-staged": {
+    packageName: "lint-staged",
+    guides: [
+      {
+        title: "lint-staged releases",
+        url: "https://github.com/lint-staged/lint-staged/releases",
+      },
+    ],
+    risks: [
+      "Task execution semantics and config loading can shift across major versions.",
+      "lint-staged upgrades should be validated together with Husky and formatter changes.",
+    ],
+  },
+  commitlint: {
+    packageName: "commitlint",
+    guides: [
+      {
+        title: "commitlint releases",
+        url: "https://github.com/conventional-changelog/commitlint/releases",
+      },
+    ],
+    risks: [
+      "Rule defaults and parser behavior can change across commitlint majors.",
+      "Hook integration should be revalidated together with Husky updates.",
+    ],
+  },
+  supertest: {
+    packageName: "supertest",
+    guides: [
+      {
+        title: "Supertest releases",
+        url: "https://github.com/forwardemail/supertest/releases",
+      },
+    ],
+    risks: [
+      "Assertion and HTTP behavior should be revalidated after major dependency upgrades.",
+      "Framework adapter changes in Express, Fastify, or NestJS can surface in integration tests first.",
+    ],
+  },
+  msw: {
+    packageName: "msw",
+    guides: [
+      {
+        title: "MSW v2 migration guide",
+        url: "https://mswjs.io/docs/migrations/1.x-to-2.x",
+      },
+    ],
+    risks: [
+      "Request interception behavior and handler signatures can change across majors.",
+      "Browser and Node test environments should be revalidated separately after upgrades.",
+    ],
+  },
   express: {
     packageName: "express",
     guides: [
@@ -266,6 +552,97 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
     risks: [
       "Plugin compatibility is the main upgrade risk.",
       "Type-provider integrations should be checked after the bump.",
+    ],
+  },
+  hono: {
+    packageName: "hono",
+    guides: [
+      {
+        title: "Hono migration guide",
+        url: "https://hono.dev/docs/migration",
+      },
+    ],
+    risks: [
+      "Context APIs and runtime adapters should be revalidated after major upgrades.",
+      "Middleware assumptions can shift when Hono runtime support evolves.",
+    ],
+  },
+  "socket.io": {
+    packageName: "socket.io",
+    guides: [
+      {
+        title: "Socket.IO migration guide",
+        url: "https://socket.io/docs/v4/migrating-from-3-x-to-4-0/",
+      },
+    ],
+    risks: [
+      "Transport defaults and protocol compatibility should be revalidated after upgrades.",
+      "Client and server packages often need coordinated version bumps.",
+    ],
+  },
+  graphql: {
+    packageName: "graphql",
+    guides: [
+      {
+        title: "GraphQL.js upgrade guides",
+        url: "https://www.graphql-js.org/upgrade-guides/",
+      },
+    ],
+    risks: [
+      "Schema utilities and validation behavior can change in subtle but breaking ways.",
+      "Framework wrappers often expose GraphQL changes later than the core package.",
+    ],
+  },
+  axios: {
+    packageName: "axios",
+    guides: [
+      {
+        title: "Axios migration guide",
+        url: "https://github.com/axios/axios/blob/v1.x/MIGRATION_GUIDE.md",
+      },
+    ],
+    risks: [
+      "Request config defaults and interceptor behavior should be retested after major upgrades.",
+      "HTTP client changes can surface only in production integrations if validation is too narrow.",
+    ],
+  },
+  zod: {
+    packageName: "zod",
+    guides: [
+      {
+        title: "Zod 4 migration guide",
+        url: "https://zod.dev/v4?id=migration-guide",
+      },
+    ],
+    risks: [
+      "Schema inference and issue formatting can change across Zod majors.",
+      "Validation layer upgrades can cascade into API and form typing errors.",
+    ],
+  },
+  lodash: {
+    packageName: "lodash",
+    guides: [
+      {
+        title: "Lodash releases",
+        url: "https://github.com/lodash/lodash/releases",
+      },
+    ],
+    risks: [
+      "Import style and tree-shaking assumptions should be revalidated if usage is spread across the repo.",
+      "Legacy CommonJS consumption patterns can complicate modernization work.",
+    ],
+  },
+  rxjs: {
+    packageName: "rxjs",
+    guides: [
+      {
+        title: "RxJS migration guide",
+        url: "https://rxjs.dev/guide/v7/migration",
+      },
+    ],
+    risks: [
+      "Operator imports and scheduler behavior can shift across RxJS majors.",
+      "Framework-specific integrations often mask RxJS breaking changes until runtime.",
     ],
   },
   nestjs: {
@@ -307,26 +684,75 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
       "Template compilation and builder settings should be revalidated after the bump.",
     ],
   },
+  turbo: {
+    packageName: "turbo",
+    guides: [
+      {
+        title: "Turborepo upgrade guide",
+        url: "https://turborepo.com/docs/crafting-your-repository/upgrading",
+      },
+    ],
+    risks: [
+      "Pipeline semantics and task caching should be revalidated after Turbo upgrades.",
+      "Monorepo tool changes can affect CI and local workflows differently.",
+    ],
+  },
+  nx: {
+    packageName: "nx",
+    guides: [
+      {
+        title: "Nx migrations",
+        url: "https://nx.dev/features/automate-updating-dependencies",
+      },
+    ],
+    risks: [
+      "Nx upgrades often span workspace config, generators, executors, and plugin packages.",
+      "Affected commands and cache behavior should be revalidated in CI.",
+    ],
+  },
+  tsup: {
+    packageName: "tsup",
+    guides: [
+      {
+        title: "tsup releases",
+        url: "https://github.com/egoist/tsup/releases",
+      },
+    ],
+    risks: [
+      "Bundling defaults and output format behavior can change across tsup versions.",
+      "tsup upgrades should be revalidated together with esbuild and package export settings.",
+    ],
+  },
 };
 
+const GUIDE_KEY_ALIASES: Record<string, string> = {
+  "react-dom": "react",
+  "@babel/core": "babel",
+  "@swc/core": "swc",
+  "@reduxjs/toolkit": "redux",
+  "@tanstack/react-query": "react-query",
+  playwright: "@playwright/test",
+  "@commitlint/cli": "commitlint",
+  storybook: "storybook",
+};
+
+const GUIDE_KEY_PREFIXES: ReadonlyArray<[string, string]> = [
+  ["@storybook/", "storybook"],
+  ["@nestjs/", "nestjs"],
+  ["@remix-run/", "remix"],
+  ["@angular/", "angular"],
+];
+
 function getGuideKey(packageName: string): string {
-  if (packageName === "react-dom") {
-    return "react";
+  const alias = GUIDE_KEY_ALIASES[packageName];
+  if (alias) {
+    return alias;
   }
-  if (packageName === "playwright") {
-    return "@playwright/test";
-  }
-  if (packageName === "storybook" || packageName.startsWith("@storybook/")) {
-    return "storybook";
-  }
-  if (packageName.startsWith("@nestjs/")) {
-    return "nestjs";
-  }
-  if (packageName.startsWith("@remix-run/")) {
-    return "remix";
-  }
-  if (packageName.startsWith("@angular/")) {
-    return "angular";
+
+  for (const [prefix, key] of GUIDE_KEY_PREFIXES) {
+    if (packageName.startsWith(prefix)) {
+      return key;
+    }
   }
 
   return packageName;

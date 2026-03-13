@@ -1,25 +1,59 @@
 export const SUPPORTED_PACKAGES = [
   "typescript",
   "eslint",
+  "prettier",
+  "postcss",
   "vite",
   "vitest",
   "jest",
+  "mocha",
+  "webpack",
+  "rollup",
+  "esbuild",
+  "tsup",
+  "turbo",
+  "nx",
+  "sass",
+  "@babel/core",
+  "@swc/core",
   "react",
   "react-dom",
   "next",
+  "react-router",
+  "redux",
+  "@reduxjs/toolkit",
+  "@tanstack/react-query",
   "vue",
+  "vue-router",
+  "pinia",
   "nuxt",
   "astro",
+  "svelte",
   "@sveltejs/kit",
   "prisma",
   "@prisma/client",
+  "drizzle-orm",
+  "mongoose",
+  "typeorm",
   "tailwindcss",
   "@playwright/test",
   "playwright",
   "cypress",
   "storybook",
+  "husky",
+  "lint-staged",
+  "@commitlint/cli",
+  "supertest",
+  "msw",
   "express",
   "fastify",
+  "hono",
+  "socket.io",
+  "graphql",
+  "axios",
+  "zod",
+  "lodash",
+  "rxjs",
   "@nestjs/core",
   "@remix-run/react",
   "@remix-run/node",
@@ -52,9 +86,16 @@ export interface DependencyEntry {
 export interface ConfigPresence {
   tsconfig: string[];
   eslint: string[];
+  prettier: string[];
+  postcss: string[];
+  webpack: string[];
+  rollup: string[];
   vite: string[];
   vitest: string[];
   jest: string[];
+  mocha: string[];
+  babel: string[];
+  swc: string[];
   next: string[];
   nuxt: string[];
   astro: string[];
@@ -63,6 +104,11 @@ export interface ConfigPresence {
   playwright: string[];
   cypress: string[];
   storybook: string[];
+  husky: string[];
+  lintStaged: string[];
+  commitlint: string[];
+  turbo: string[];
+  nx: string[];
   nest: string[];
   remix: string[];
   angular: string[];

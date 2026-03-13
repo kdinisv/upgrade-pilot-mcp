@@ -6,15 +6,22 @@ V1 is a workflow MCP for popular JS/TS upgrade routes:
 
 - package manager driven Node.js repositories
 - TypeScript present or planned
-- ESLint
-- Vite, Vitest, Jest
-- React, React DOM, Next.js
-- Vue, Nuxt
-- Astro, SvelteKit, Remix
+- ESLint, Prettier
+- PostCSS, Webpack, Rollup, esbuild, tsup
+- Vite, Vitest, Jest, Mocha
+- Babel, SWC
+- React, React DOM, Next.js, React Router, Redux Toolkit, TanStack Query
+- Vue, Vue Router, Pinia, Nuxt
+- Astro, Svelte, SvelteKit, Remix
 - Tailwind CSS, Storybook
 - Playwright, Cypress
 - Prisma
-- Express, Fastify, NestJS
+- Express, Fastify, Hono, NestJS
+- GraphQL, Socket.IO
+- Mongoose, Drizzle ORM, TypeORM
+- Husky, lint-staged, commitlint
+- Turbo, Nx
+- Axios, Zod, Lodash, RxJS
 - Angular
 
 Supported package families also include `@nestjs/*`, `@storybook/*`, `@remix-run/*`, and `@angular/*`.
@@ -46,7 +53,7 @@ Output:
 - package.json metadata
 - scripts
 - dependency snapshot for supported packages
-- config-file presence for TypeScript, ESLint, Vite, Vitest, Jest, Next, Nuxt, Astro, SvelteKit, Tailwind, Playwright, Cypress, Storybook, Nest, Remix, Angular, Prisma
+- config-file presence for TypeScript, ESLint, Prettier, PostCSS, Webpack, Rollup, Vite, Vitest, Jest, Mocha, Babel, SWC, Next, Nuxt, Astro, SvelteKit, Tailwind, Playwright, Cypress, Storybook, Husky, lint-staged, commitlint, Turbo, Nx, Nest, Remix, Angular, Prisma
 - detected stack tags
 - warnings and upgrade readiness notes
 

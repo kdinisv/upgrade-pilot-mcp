@@ -8,18 +8,30 @@ The v1 route covers:
 
 - Node.js
 - TypeScript
-- ESLint
-- Vite / Vitest / Jest
+- ESLint / Prettier
+- PostCSS / Webpack / Rollup / esbuild / tsup
+- Vite / Vitest / Jest / Mocha
+- Babel / SWC
 - React / React DOM / Next.js
+- React Router / Redux Toolkit / TanStack Query
 - Vue / Nuxt
+- Vue Router / Pinia
 - Astro / SvelteKit / Remix
+- Svelte
 - Tailwind CSS / Storybook
 - Playwright / Cypress
 - Prisma
-- Express / Fastify / NestJS
+- Express / Fastify / Hono / NestJS
+- GraphQL / Socket.IO
+- Mongoose / Drizzle ORM / TypeORM
+- Husky / lint-staged / commitlint
+- Turbo / Nx
+- Axios / Zod / Lodash / RxJS
 - Angular
 
 Recognized package families also include `@nestjs/*`, `@storybook/*`, `@remix-run/*`, and `@angular/*`.
+
+The current popular-package expansion is based on a last-month npm downloads snapshot collected on 2026-03-13. The current top coverage includes `postcss`, `typescript`, `esbuild`, `lodash`, `@babel/core`, `zod`, `eslint`, `axios`, `react`, `rollup`, `react-dom`, `rxjs`, `express`, `prettier`, `vite`, `tailwindcss`, `webpack`, `jest`, `vitest`, `playwright`, `react-router`, `next`, `graphql`, `sass`, `redux`, `@tanstack/react-query`, `husky`, `hono`, `@playwright/test`, `@swc/core`, `lint-staged`, `mocha`, `@reduxjs/toolkit`, `storybook`, `socket.io`, `supertest`, `msw`, `turbo`, `vue`, `nx`, `cypress`, `@commitlint/cli`, `fastify`, `drizzle-orm`, `vue-router`, `mongoose`, `tsup`, `typeorm`, `svelte`, and `pinia`.
 
 The server is designed around agent workflow rather than thin API wrapping. It focuses on project fingerprinting, upgrade path detection, breaking-change guidance, targeted deprecation scanning, safe codemod execution, validation, and PR-summary generation.
 
@@ -120,18 +132,30 @@ v1 scaffold with a runnable stdio MCP server, contract-aligned tools, prompts, a
 
 - Node.js
 - TypeScript
-- ESLint
-- Vite / Vitest / Jest
+- ESLint / Prettier
+- PostCSS / Webpack / Rollup / esbuild / tsup
+- Vite / Vitest / Jest / Mocha
+- Babel / SWC
 - React / React DOM / Next.js
+- React Router / Redux Toolkit / TanStack Query
 - Vue / Nuxt
+- Vue Router / Pinia
 - Astro / SvelteKit / Remix
+- Svelte
 - Tailwind CSS / Storybook
 - Playwright / Cypress
 - Prisma
-- Express / Fastify / NestJS
+- Express / Fastify / Hono / NestJS
+- GraphQL / Socket.IO
+- Mongoose / Drizzle ORM / TypeORM
+- Husky / lint-staged / commitlint
+- Turbo / Nx
+- Axios / Zod / Lodash / RxJS
 - Angular
 
 Дополнительно распознаются семейства пакетов `@nestjs/*`, `@storybook/*`, `@remix-run/*` и `@angular/*`.
+
+Текущее расширение популярных пакетов основано на снимке monthly downloads из npm за 2026-03-13. В покрытие top-list сейчас входят `postcss`, `typescript`, `esbuild`, `lodash`, `@babel/core`, `zod`, `eslint`, `axios`, `react`, `rollup`, `react-dom`, `rxjs`, `express`, `prettier`, `vite`, `tailwindcss`, `webpack`, `jest`, `vitest`, `playwright`, `react-router`, `next`, `graphql`, `sass`, `redux`, `@tanstack/react-query`, `husky`, `hono`, `@playwright/test`, `@swc/core`, `lint-staged`, `mocha`, `@reduxjs/toolkit`, `storybook`, `socket.io`, `supertest`, `msw`, `turbo`, `vue`, `nx`, `cypress`, `@commitlint/cli`, `fastify`, `drizzle-orm`, `vue-router`, `mongoose`, `tsup`, `typeorm`, `svelte` и `pinia`.
 
 Сервер спроектирован вокруг рабочего сценария агента, а не как тонкая обёртка над API. Он решает конкретную дорогую задачу: «обнови проект с минимальным риском, не сломай типы, тесты, конфиг, линтер, билды и CI».
 

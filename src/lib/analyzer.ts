@@ -13,111 +13,168 @@ import {
   relativeTo,
 } from "./fs-utils.js";
 
-const TS_CONFIG_CANDIDATES = ["tsconfig.json", "tsconfig.base.json"];
-
-const ESLINT_CANDIDATES = [
-  "eslint.config.js",
-  "eslint.config.mjs",
-  "eslint.config.cjs",
-  "eslint.config.ts",
-  ".eslintrc",
-  ".eslintrc.js",
-  ".eslintrc.cjs",
-  ".eslintrc.mjs",
-  ".eslintrc.json",
-  ".eslintrc.yaml",
-  ".eslintrc.yml",
-];
-
-const VITE_CANDIDATES = [
-  "vite.config.ts",
-  "vite.config.mts",
-  "vite.config.js",
-  "vite.config.mjs",
-  "vite.config.cjs",
-];
-
-const VITEST_CANDIDATES = [
-  "vitest.config.ts",
-  "vitest.config.mts",
-  "vitest.config.js",
-  "vitest.config.mjs",
-  "vitest.config.cjs",
-];
-
-const JEST_CANDIDATES = [
-  "jest.config.ts",
-  "jest.config.js",
-  "jest.config.cjs",
-  "jest.config.mjs",
-];
-
-const NEXT_CANDIDATES = [
-  "next.config.ts",
-  "next.config.mts",
-  "next.config.js",
-  "next.config.mjs",
-  "next.config.cjs",
-];
-
-const NUXT_CANDIDATES = ["nuxt.config.ts", "nuxt.config.js", "nuxt.config.mjs"];
-
-const ASTRO_CANDIDATES = [
-  "astro.config.ts",
-  "astro.config.mts",
-  "astro.config.js",
-  "astro.config.mjs",
-  "astro.config.cjs",
-];
-
-const SVELTE_CANDIDATES = [
-  "svelte.config.ts",
-  "svelte.config.js",
-  "svelte.config.mjs",
-  "svelte.config.cjs",
-];
-
-const TAILWIND_CANDIDATES = [
-  "tailwind.config.ts",
-  "tailwind.config.js",
-  "tailwind.config.mjs",
-  "tailwind.config.cjs",
-];
-
-const PLAYWRIGHT_CANDIDATES = [
-  "playwright.config.ts",
-  "playwright.config.js",
-  "playwright.config.mjs",
-  "playwright.config.cjs",
-];
-
-const CYPRESS_CANDIDATES = [
-  "cypress.config.ts",
-  "cypress.config.js",
-  "cypress.config.mjs",
-  "cypress.config.cjs",
-];
-
-const STORYBOOK_CANDIDATES = [
-  ".storybook/main.ts",
-  ".storybook/main.js",
-  ".storybook/main.mts",
-  ".storybook/main.mjs",
-  ".storybook/main.cjs",
-];
-
-const NEST_CANDIDATES = ["nest-cli.json"];
-
-const REMIX_CANDIDATES = [
-  "remix.config.ts",
-  "remix.config.js",
-  "remix.config.mjs",
-  "remix.config.cjs",
-];
-
-const ANGULAR_CANDIDATES = ["angular.json"];
-
-const PRISMA_CANDIDATES = ["prisma/schema.prisma"];
+const CONFIG_REGISTRY: Record<keyof ConfigPresence, string[]> = {
+  tsconfig: ["tsconfig.json", "tsconfig.base.json"],
+  eslint: [
+    "eslint.config.js",
+    "eslint.config.mjs",
+    "eslint.config.cjs",
+    "eslint.config.ts",
+    ".eslintrc",
+    ".eslintrc.js",
+    ".eslintrc.cjs",
+    ".eslintrc.mjs",
+    ".eslintrc.json",
+    ".eslintrc.yaml",
+    ".eslintrc.yml",
+  ],
+  prettier: [
+    ".prettierrc",
+    ".prettierrc.json",
+    ".prettierrc.yaml",
+    ".prettierrc.yml",
+    ".prettierrc.js",
+    ".prettierrc.cjs",
+    ".prettierrc.mjs",
+    "prettier.config.js",
+    "prettier.config.cjs",
+    "prettier.config.mjs",
+    "prettier.config.ts",
+  ],
+  postcss: [
+    "postcss.config.js",
+    "postcss.config.cjs",
+    "postcss.config.mjs",
+    "postcss.config.ts",
+  ],
+  webpack: [
+    "webpack.config.ts",
+    "webpack.config.js",
+    "webpack.config.mjs",
+    "webpack.config.cjs",
+  ],
+  rollup: [
+    "rollup.config.ts",
+    "rollup.config.js",
+    "rollup.config.mjs",
+    "rollup.config.cjs",
+  ],
+  vite: [
+    "vite.config.ts",
+    "vite.config.mts",
+    "vite.config.js",
+    "vite.config.mjs",
+    "vite.config.cjs",
+  ],
+  vitest: [
+    "vitest.config.ts",
+    "vitest.config.mts",
+    "vitest.config.js",
+    "vitest.config.mjs",
+    "vitest.config.cjs",
+  ],
+  jest: [
+    "jest.config.ts",
+    "jest.config.js",
+    "jest.config.cjs",
+    "jest.config.mjs",
+  ],
+  mocha: [
+    ".mocharc.json",
+    ".mocharc.yaml",
+    ".mocharc.yml",
+    ".mocharc.js",
+    ".mocharc.cjs",
+    ".mocharc.mjs",
+  ],
+  babel: [
+    "babel.config.js",
+    "babel.config.cjs",
+    "babel.config.mjs",
+    "babel.config.ts",
+    ".babelrc",
+    ".babelrc.json",
+    ".babelrc.js",
+    ".babelrc.cjs",
+  ],
+  swc: [".swcrc"],
+  next: [
+    "next.config.ts",
+    "next.config.mts",
+    "next.config.js",
+    "next.config.mjs",
+    "next.config.cjs",
+  ],
+  nuxt: ["nuxt.config.ts", "nuxt.config.js", "nuxt.config.mjs"],
+  astro: [
+    "astro.config.ts",
+    "astro.config.mts",
+    "astro.config.js",
+    "astro.config.mjs",
+    "astro.config.cjs",
+  ],
+  svelte: [
+    "svelte.config.ts",
+    "svelte.config.js",
+    "svelte.config.mjs",
+    "svelte.config.cjs",
+  ],
+  tailwind: [
+    "tailwind.config.ts",
+    "tailwind.config.js",
+    "tailwind.config.mjs",
+    "tailwind.config.cjs",
+  ],
+  playwright: [
+    "playwright.config.ts",
+    "playwright.config.js",
+    "playwright.config.mjs",
+    "playwright.config.cjs",
+  ],
+  cypress: [
+    "cypress.config.ts",
+    "cypress.config.js",
+    "cypress.config.mjs",
+    "cypress.config.cjs",
+  ],
+  storybook: [
+    ".storybook/main.ts",
+    ".storybook/main.js",
+    ".storybook/main.mts",
+    ".storybook/main.mjs",
+    ".storybook/main.cjs",
+  ],
+  husky: [".husky/pre-commit", ".husky/commit-msg", ".husky/pre-push"],
+  lintStaged: [
+    ".lintstagedrc",
+    ".lintstagedrc.json",
+    ".lintstagedrc.yaml",
+    ".lintstagedrc.yml",
+    ".lintstagedrc.js",
+    ".lintstagedrc.cjs",
+    "lint-staged.config.js",
+    "lint-staged.config.mjs",
+    "lint-staged.config.cjs",
+    "lint-staged.config.ts",
+  ],
+  commitlint: [
+    "commitlint.config.js",
+    "commitlint.config.cjs",
+    "commitlint.config.mjs",
+    "commitlint.config.ts",
+  ],
+  turbo: ["turbo.json"],
+  nx: ["nx.json"],
+  nest: ["nest-cli.json"],
+  remix: [
+    "remix.config.ts",
+    "remix.config.js",
+    "remix.config.mjs",
+    "remix.config.cjs",
+  ],
+  angular: ["angular.json"],
+  prisma: ["prisma/schema.prisma"],
+};
 
 const LOCKFILE_CANDIDATES = [
   "pnpm-lock.yaml",
@@ -205,6 +262,89 @@ function isSupportedDependency(name: string): boolean {
   );
 }
 
+interface StackDetectorEntry {
+  tag: string;
+  packages?: string[];
+  prefixes?: string[];
+  configKeys?: (keyof ConfigPresence)[];
+}
+
+const STACK_DETECTORS: StackDetectorEntry[] = [
+  { tag: "typescript", packages: ["typescript"], configKeys: ["tsconfig"] },
+  { tag: "eslint", packages: ["eslint"], configKeys: ["eslint"] },
+  { tag: "prettier", packages: ["prettier"], configKeys: ["prettier"] },
+  { tag: "postcss", packages: ["postcss"], configKeys: ["postcss"] },
+  { tag: "webpack", packages: ["webpack"], configKeys: ["webpack"] },
+  { tag: "rollup", packages: ["rollup"], configKeys: ["rollup"] },
+  { tag: "esbuild", packages: ["esbuild"] },
+  { tag: "vite", packages: ["vite"], configKeys: ["vite"] },
+  { tag: "vitest", packages: ["vitest"], configKeys: ["vitest"] },
+  { tag: "jest", packages: ["jest"], configKeys: ["jest"] },
+  { tag: "mocha", packages: ["mocha"], configKeys: ["mocha"] },
+  { tag: "babel", packages: ["@babel/core"], configKeys: ["babel"] },
+  { tag: "swc", packages: ["@swc/core"], configKeys: ["swc"] },
+  { tag: "react", packages: ["react", "react-dom"] },
+  { tag: "react-router", packages: ["react-router"] },
+  { tag: "redux", packages: ["redux", "@reduxjs/toolkit"] },
+  { tag: "react-query", packages: ["@tanstack/react-query"] },
+  { tag: "next", packages: ["next"], configKeys: ["next"] },
+  { tag: "vue", packages: ["vue"] },
+  { tag: "vue-router", packages: ["vue-router"] },
+  { tag: "pinia", packages: ["pinia"] },
+  { tag: "nuxt", packages: ["nuxt"], configKeys: ["nuxt"] },
+  { tag: "astro", packages: ["astro"], configKeys: ["astro"] },
+  { tag: "svelte", packages: ["svelte"] },
+  { tag: "sveltekit", packages: ["@sveltejs/kit"], configKeys: ["svelte"] },
+  {
+    tag: "prisma",
+    packages: ["prisma", "@prisma/client"],
+    configKeys: ["prisma"],
+  },
+  { tag: "tailwindcss", packages: ["tailwindcss"], configKeys: ["tailwind"] },
+  {
+    tag: "playwright",
+    packages: ["@playwright/test", "playwright"],
+    configKeys: ["playwright"],
+  },
+  { tag: "cypress", packages: ["cypress"], configKeys: ["cypress"] },
+  {
+    tag: "storybook",
+    packages: ["storybook"],
+    prefixes: ["@storybook/"],
+    configKeys: ["storybook"],
+  },
+  { tag: "husky", packages: ["husky"], configKeys: ["husky"] },
+  { tag: "lint-staged", packages: ["lint-staged"], configKeys: ["lintStaged"] },
+  {
+    tag: "commitlint",
+    packages: ["@commitlint/cli"],
+    configKeys: ["commitlint"],
+  },
+  { tag: "turbo", packages: ["turbo"], configKeys: ["turbo"] },
+  { tag: "nx", packages: ["nx"], configKeys: ["nx"] },
+  { tag: "express", packages: ["express"] },
+  { tag: "fastify", packages: ["fastify"] },
+  { tag: "hono", packages: ["hono"] },
+  { tag: "graphql", packages: ["graphql"] },
+  { tag: "socket.io", packages: ["socket.io"] },
+  { tag: "mongoose", packages: ["mongoose"] },
+  { tag: "drizzle", packages: ["drizzle-orm"] },
+  { tag: "typeorm", packages: ["typeorm"] },
+  {
+    tag: "nestjs",
+    packages: ["@nestjs/core"],
+    prefixes: ["@nestjs/"],
+    configKeys: ["nest"],
+  },
+  {
+    tag: "remix",
+    packages: ["@remix-run/react", "@remix-run/node"],
+    prefixes: ["@remix-run/"],
+    configKeys: ["remix"],
+  },
+  { tag: "angular", prefixes: ["@angular/"], configKeys: ["angular"] },
+];
+
 function detectStack(
   dependencies: DependencyEntry[],
   configPresence: ConfigPresence,
@@ -212,68 +352,31 @@ function detectStack(
   const stack = new Set<string>();
   const names = new Set(dependencies.map((d) => d.name));
 
-  if (names.has("typescript") || configPresence.tsconfig.length > 0)
-    stack.add("typescript");
-  if (names.has("eslint") || configPresence.eslint.length > 0)
-    stack.add("eslint");
-  if (names.has("vite") || configPresence.vite.length > 0) stack.add("vite");
-  if (names.has("vitest") || configPresence.vitest.length > 0)
-    stack.add("vitest");
-  if (names.has("jest") || configPresence.jest.length > 0) stack.add("jest");
-  if (names.has("react") || names.has("react-dom")) stack.add("react");
-  if (names.has("next") || configPresence.next.length > 0) stack.add("next");
-  if (names.has("vue")) stack.add("vue");
-  if (names.has("nuxt") || configPresence.nuxt.length > 0) stack.add("nuxt");
-  if (names.has("astro") || configPresence.astro.length > 0) stack.add("astro");
-  if (names.has("@sveltejs/kit") || configPresence.svelte.length > 0)
-    stack.add("sveltekit");
-  if (
-    names.has("prisma") ||
-    names.has("@prisma/client") ||
-    configPresence.prisma.length > 0
-  )
-    stack.add("prisma");
-  if (names.has("tailwindcss") || configPresence.tailwind.length > 0)
-    stack.add("tailwindcss");
-  if (
-    names.has("@playwright/test") ||
-    names.has("playwright") ||
-    configPresence.playwright.length > 0
-  ) {
-    stack.add("playwright");
-  }
-  if (names.has("cypress") || configPresence.cypress.length > 0) {
-    stack.add("cypress");
-  }
-  if (
-    names.has("storybook") ||
-    hasPackage(names, "@storybook/") ||
-    configPresence.storybook.length > 0
-  ) {
-    stack.add("storybook");
-  }
-  if (names.has("express")) stack.add("express");
-  if (names.has("fastify")) stack.add("fastify");
-  if (
-    names.has("@nestjs/core") ||
-    hasPackage(names, "@nestjs/") ||
-    configPresence.nest.length > 0
-  ) {
-    stack.add("nestjs");
-  }
-  if (
-    names.has("@remix-run/react") ||
-    names.has("@remix-run/node") ||
-    hasPackage(names, "@remix-run/") ||
-    configPresence.remix.length > 0
-  ) {
-    stack.add("remix");
-  }
-  if (hasPackage(names, "@angular/") || configPresence.angular.length > 0) {
-    stack.add("angular");
+  for (const detector of STACK_DETECTORS) {
+    const hasMatchingPackage =
+      detector.packages?.some((p) => names.has(p)) ?? false;
+    const hasMatchingPrefix =
+      detector.prefixes?.some((p) => hasPackage(names, p)) ?? false;
+    const hasMatchingConfig =
+      detector.configKeys?.some((k) => configPresence[k].length > 0) ?? false;
+
+    if (hasMatchingPackage || hasMatchingPrefix || hasMatchingConfig) {
+      stack.add(detector.tag);
+    }
   }
 
   return [...stack];
+}
+
+async function detectConfigPresence(rootPath: string): Promise<ConfigPresence> {
+  const result = {} as ConfigPresence;
+  for (const key of Object.keys(CONFIG_REGISTRY) as Array<
+    keyof ConfigPresence
+  >) {
+    const found = await findAllExisting(rootPath, CONFIG_REGISTRY[key]);
+    result[key] = found.map((fp) => relativeTo(rootPath, fp));
+  }
+  return result;
 }
 
 export async function analyzeProject(
@@ -286,59 +389,7 @@ export async function analyzeProject(
     ? await readJsoncFile<PackageJsonShape>(packageJsonPath)
     : null;
 
-  const configPresence: ConfigPresence = {
-    tsconfig: (await findAllExisting(rootPath, TS_CONFIG_CANDIDATES)).map(
-      (filePath) => relativeTo(rootPath, filePath),
-    ),
-    eslint: (await findAllExisting(rootPath, ESLINT_CANDIDATES)).map(
-      (filePath) => relativeTo(rootPath, filePath),
-    ),
-    vite: (await findAllExisting(rootPath, VITE_CANDIDATES)).map((filePath) =>
-      relativeTo(rootPath, filePath),
-    ),
-    vitest: (await findAllExisting(rootPath, VITEST_CANDIDATES)).map(
-      (filePath) => relativeTo(rootPath, filePath),
-    ),
-    jest: (await findAllExisting(rootPath, JEST_CANDIDATES)).map((filePath) =>
-      relativeTo(rootPath, filePath),
-    ),
-    next: (await findAllExisting(rootPath, NEXT_CANDIDATES)).map((filePath) =>
-      relativeTo(rootPath, filePath),
-    ),
-    nuxt: (await findAllExisting(rootPath, NUXT_CANDIDATES)).map((filePath) =>
-      relativeTo(rootPath, filePath),
-    ),
-    astro: (await findAllExisting(rootPath, ASTRO_CANDIDATES)).map((filePath) =>
-      relativeTo(rootPath, filePath),
-    ),
-    svelte: (await findAllExisting(rootPath, SVELTE_CANDIDATES)).map(
-      (filePath) => relativeTo(rootPath, filePath),
-    ),
-    tailwind: (await findAllExisting(rootPath, TAILWIND_CANDIDATES)).map(
-      (filePath) => relativeTo(rootPath, filePath),
-    ),
-    playwright: (await findAllExisting(rootPath, PLAYWRIGHT_CANDIDATES)).map(
-      (filePath) => relativeTo(rootPath, filePath),
-    ),
-    cypress: (await findAllExisting(rootPath, CYPRESS_CANDIDATES)).map(
-      (filePath) => relativeTo(rootPath, filePath),
-    ),
-    storybook: (await findAllExisting(rootPath, STORYBOOK_CANDIDATES)).map(
-      (filePath) => relativeTo(rootPath, filePath),
-    ),
-    nest: (await findAllExisting(rootPath, NEST_CANDIDATES)).map((filePath) =>
-      relativeTo(rootPath, filePath),
-    ),
-    remix: (await findAllExisting(rootPath, REMIX_CANDIDATES)).map((filePath) =>
-      relativeTo(rootPath, filePath),
-    ),
-    angular: (await findAllExisting(rootPath, ANGULAR_CANDIDATES)).map(
-      (filePath) => relativeTo(rootPath, filePath),
-    ),
-    prisma: (await findAllExisting(rootPath, PRISMA_CANDIDATES)).map(
-      (filePath) => relativeTo(rootPath, filePath),
-    ),
-  };
+  const configPresence = await detectConfigPresence(rootPath);
 
   const dependencies = packageJson ? flattenDependencies(packageJson) : [];
   const supportedDependencies = dependencies.filter((d) =>
