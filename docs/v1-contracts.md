@@ -1,0 +1,210 @@
+# upgrade-pilot-mcp v1 contracts
+
+## Scope
+
+V1 is a workflow MCP for one narrow route:
+
+- package manager driven Node.js repositories
+- TypeScript present or planned
+- ESLint
+- Vite
+- Vitest
+- Vue 3 or Nuxt
+- Prisma
+
+The server is optimized for low-risk upgrade orchestration, not for generic package intelligence and not for arbitrary code transformation.
+
+## Non-goals
+
+- generic package manager wrapper
+- monorepo-wide graph optimization
+- arbitrary codemod execution from remote sources
+- HTTP transport in v1
+- silent mutation of user repositories
+
+## Tool contracts
+
+### analyze_project
+
+Purpose: build a stable fingerprint of the repository before any upgrade work.
+
+Input:
+
+- rootPath: optional absolute path to the target repository
+- includeScripts: optional boolean, defaults to true
+
+Output:
+
+- package manager and lockfile
+- package.json metadata
+- scripts
+- dependency snapshot for supported packages
+- config-file presence for TypeScript, ESLint, Vite, Vitest, Jest, Nuxt, Prisma
+- detected stack tags
+- warnings and upgrade readiness notes
+
+### detect_upgrade_paths
+
+Purpose: compute a pragmatic upgrade sequence for supported packages.
+
+Input:
+
+- rootPath: optional absolute path
+- targets: optional subset of supported packages
+
+Output:
+
+- installed ranges
+- normalized current version baseline when derivable
+- latest published version when resolvable
+- required major-step sequence
+- notes about unknown ranges and network-resolution failures
+
+### find_breaking_changes
+
+Purpose: attach curated migration references and risk themes to the selected packages.
+
+Input:
+
+- rootPath: optional absolute path
+- targets: optional subset of supported packages
+
+Output:
+
+- official migration-guide URLs per package
+- release-note URLs per package when known
+- curated risk themes that should be checked during the upgrade
+
+### scan_repo_for_deprecations
+
+Purpose: search the codebase for high-signal deprecated or risky patterns related to the supported route.
+
+Input:
+
+- rootPath: optional absolute path
+- targets: optional subset of supported packages
+- maxFindings: optional limit, defaults to 100
+
+Output:
+
+- finding id and severity
+- file path and line number
+- affected package
+- why it is risky
+- recommended next action
+
+### generate_upgrade_plan
+
+Purpose: turn project analysis and package intelligence into an ordered upgrade plan.
+
+Input:
+
+- rootPath: optional absolute path
+- targets: optional subset of supported packages
+
+Output:
+
+- phase-by-phase plan
+- sequencing rationale
+- commands or actions to take manually
+- risk list
+- validation checklist
+
+### apply_safe_codemods
+
+Purpose: execute only deterministic, local, reviewable codemods.
+
+Input:
+
+- rootPath: optional absolute path
+- mode: dry-run or apply
+- codemodIds: optional subset of supported codemods
+
+Output:
+
+- detected codemod candidates
+- per-file replacements
+- whether files were changed
+- unsupported codemod requests
+
+V1 codemods:
+
+- prisma-relation-mode: rename referentialIntegrity to relationMode in schema.prisma
+
+### validate_upgrade
+
+Purpose: run the smallest reliable validation set after dependency and config changes.
+
+Input:
+
+- rootPath: optional absolute path
+- include: optional list of validations from types, lint, test, build
+
+Output:
+
+- executed commands
+- exit codes
+- stdout and stderr excerpts
+- overall pass/fail summary
+- skipped validations with reasons
+
+### write_upgrade_pr_summary
+
+Purpose: produce a PR-ready markdown summary from the current repository state and computed plan.
+
+Input:
+
+- rootPath: optional absolute path
+- targets: optional subset of supported packages
+
+Output:
+
+- markdown summary with change scope
+- package upgrade route
+- risks
+- validation status if available
+- manual follow-up checklist
+
+## Resource contracts
+
+Resource URIs are intentionally stable and artifact-shaped:
+
+- upgrade://analysis/latest
+- upgrade://paths/latest
+- upgrade://breaking-changes/latest
+- upgrade://findings/latest
+- upgrade://plan/latest
+- upgrade://validation/latest
+- upgrade://summary/latest
+
+Each resource represents the last successfully generated artifact for the current server process and must be read-only.
+
+## Prompt contracts
+
+### plan_upgrade_route
+
+Purpose: instruct a client agent to execute the safest upgrade workflow in the correct order.
+
+Arguments:
+
+- rootPath
+- targets
+- objective
+
+### draft_upgrade_pr
+
+Purpose: instruct a client agent to turn current artifacts into a concise, reviewer-friendly PR description.
+
+Arguments:
+
+- rootPath
+- targets
+- includeValidation
+
+## Safety rules
+
+- Default behavior is read-only.
+- Codemods require explicit mode=apply.
+- Validation only executes local commands from the target repository.
+- Network access is limited to version resolution and curated migration-reference URLs.
+- Tools should return actionable diagnostics instead of generic failures.
