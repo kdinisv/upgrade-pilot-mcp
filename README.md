@@ -57,6 +57,23 @@ npm run build
 
 ### MCP client configuration
 
+Recommended after publishing:
+
+Use this when the package is consumed from npm. If you are inside this repository itself, prefer the local development config below.
+
+```json
+{
+  "mcpServers": {
+    "upgrade-pilot": {
+      "command": "npx",
+      "args": ["-y", "upgrade-pilot-mcp@latest"]
+    }
+  }
+}
+```
+
+Local development:
+
 ```json
 {
   "mcpServers": {
@@ -67,6 +84,8 @@ npm run build
   }
 }
 ```
+
+Windows note: if a client does not resolve `npx`, use `npx.cmd` as the command.
 
 ## Security
 
@@ -139,6 +158,23 @@ npm run build
 
 ### Конфигурация MCP-клиента
 
+Рекомендуемый вариант после публикации:
+
+Используй этот вариант, когда пакет ставится из npm. Если ты находишься внутри самого репозитория, лучше использовать локальную конфигурацию ниже.
+
+```json
+{
+  "mcpServers": {
+    "upgrade-pilot": {
+      "command": "npx",
+      "args": ["-y", "upgrade-pilot-mcp@latest"]
+    }
+  }
+}
+```
+
+Для локальной разработки:
+
 ```json
 {
   "mcpServers": {
@@ -149,6 +185,8 @@ npm run build
   }
 }
 ```
+
+Примечание для Windows: если клиент не находит `npx`, укажи в `command` значение `npx.cmd`.
 
 ## Безопасность
 
