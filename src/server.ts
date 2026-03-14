@@ -47,6 +47,14 @@ function asToolResult(payload: unknown): CallToolResult {
   };
 }
 
+function errorResult(error: unknown): CallToolResult {
+  const message = error instanceof Error ? error.message : String(error);
+  return {
+    content: [{ type: "text", text: message }],
+    isError: true,
+  };
+}
+
 function rememberArtifact(
   key: keyof typeof artifacts,
   payload: unknown,
@@ -173,12 +181,16 @@ server.registerTool(
     }),
   },
   async ({ rootPath, includeScripts }) => {
-    return asToolResult(
-      rememberArtifact(
-        "analysis",
-        await analyzeProject(rootPath, includeScripts),
-      ),
-    );
+    try {
+      return asToolResult(
+        rememberArtifact(
+          "analysis",
+          await analyzeProject(rootPath, includeScripts),
+        ),
+      );
+    } catch (error) {
+      return errorResult(error);
+    }
   },
 );
 
@@ -194,9 +206,13 @@ server.registerTool(
     }),
   },
   async ({ rootPath, targets }) => {
-    return asToolResult(
-      rememberArtifact("paths", await detectUpgradePaths(rootPath, targets)),
-    );
+    try {
+      return asToolResult(
+        rememberArtifact("paths", await detectUpgradePaths(rootPath, targets)),
+      );
+    } catch (error) {
+      return errorResult(error);
+    }
   },
 );
 
@@ -212,12 +228,16 @@ server.registerTool(
     }),
   },
   async ({ rootPath, targets }) => {
-    return asToolResult(
-      rememberArtifact(
-        "breakingChanges",
-        await findBreakingChanges(rootPath, targets),
-      ),
-    );
+    try {
+      return asToolResult(
+        rememberArtifact(
+          "breakingChanges",
+          await findBreakingChanges(rootPath, targets),
+        ),
+      );
+    } catch (error) {
+      return errorResult(error);
+    }
   },
 );
 
@@ -234,12 +254,16 @@ server.registerTool(
     }),
   },
   async ({ rootPath, targets, maxFindings }) => {
-    return asToolResult(
-      rememberArtifact(
-        "findings",
-        await scanRepoForDeprecations(rootPath, targets, maxFindings),
-      ),
-    );
+    try {
+      return asToolResult(
+        rememberArtifact(
+          "findings",
+          await scanRepoForDeprecations(rootPath, targets, maxFindings),
+        ),
+      );
+    } catch (error) {
+      return errorResult(error);
+    }
   },
 );
 
@@ -255,9 +279,13 @@ server.registerTool(
     }),
   },
   async ({ rootPath, targets }) => {
-    return asToolResult(
-      rememberArtifact("plan", await generateUpgradePlan(rootPath, targets)),
-    );
+    try {
+      return asToolResult(
+        rememberArtifact("plan", await generateUpgradePlan(rootPath, targets)),
+      );
+    } catch (error) {
+      return errorResult(error);
+    }
   },
 );
 
@@ -274,7 +302,11 @@ server.registerTool(
     }),
   },
   async ({ rootPath, mode, codemodIds }) => {
-    return asToolResult(await applySafeCodemods(rootPath, mode, codemodIds));
+    try {
+      return asToolResult(await applySafeCodemods(rootPath, mode, codemodIds));
+    } catch (error) {
+      return errorResult(error);
+    }
   },
 );
 
@@ -292,9 +324,13 @@ server.registerTool(
     }),
   },
   async ({ rootPath, include }) => {
-    return asToolResult(
-      rememberArtifact("validation", await validateUpgrade(rootPath, include)),
-    );
+    try {
+      return asToolResult(
+        rememberArtifact("validation", await validateUpgrade(rootPath, include)),
+      );
+    } catch (error) {
+      return errorResult(error);
+    }
   },
 );
 
@@ -310,9 +346,13 @@ server.registerTool(
     }),
   },
   async ({ rootPath, targets }) => {
-    const markdown = await writeUpgradePrSummary(rootPath, targets);
-    rememberArtifact("summary", markdown);
-    return asToolResult({ markdown });
+    try {
+      const markdown = await writeUpgradePrSummary(rootPath, targets);
+      rememberArtifact("summary", markdown);
+      return asToolResult({ markdown });
+    } catch (error) {
+      return errorResult(error);
+    }
   },
 );
 
