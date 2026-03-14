@@ -161,6 +161,8 @@ Output:
 V1 codemods:
 
 - prisma-relation-mode: rename referentialIntegrity to relationMode in schema.prisma
+- eslint-flat-config: generate eslint.config.mjs FlatCompat bridge from legacy .eslintrc.* files
+- tailwind-v4-import: replace @tailwind base/components/utilities and @import tailwindcss/* with @import "tailwindcss"
 
 ### validate_upgrade
 
@@ -196,6 +198,101 @@ Output:
 - risks
 - validation status if available
 - manual follow-up checklist
+
+### install_upgrade
+
+Purpose: install specific package versions using the detected package manager (npm, yarn, pnpm).
+
+Input:
+
+- rootPath: optional absolute path
+- packages: array of { name, version, dev? }
+
+Output:
+
+- command executed
+- exit code, stdout, stderr
+- packages installed
+
+### check_compatibility
+
+Purpose: verify peerDependency compatibility for a set of packages before installing.
+
+Input:
+
+- packages: array of { name, version }
+
+Output:
+
+- per-package peer dependency map
+- compatibility status
+- conflict descriptions
+
+### create_checkpoint
+
+Purpose: tag current HEAD for safe rollback during upgrade.
+
+Input:
+
+- rootPath: optional absolute path
+- label: checkpoint name, defaults to "pre-upgrade"
+
+Output:
+
+- created tag ref
+- success status
+
+### restore_checkpoint
+
+Purpose: hard-reset to a previously created checkpoint tag.
+
+Input:
+
+- rootPath: optional absolute path
+- label: checkpoint name
+
+Output:
+
+- restored tag ref
+- success status
+
+### list_checkpoints
+
+Purpose: list all upgrade-pilot checkpoint tags in the repository.
+
+Input:
+
+- rootPath: optional absolute path
+
+Output:
+
+- list of checkpoint tag names
+
+## Cross-cutting features
+
+### outputFormat parameter
+
+Five diagnostic tools accept `outputFormat?: "full" | "compact"`:
+
+- analyze_project
+- detect_upgrade_paths
+- find_breaking_changes
+- scan_repo_for_deprecations
+- generate_upgrade_plan
+
+When `"compact"`, responses are stripped to essential fields with counts replacing arrays. Saves tokens on subsequent calls.
+
+### Analysis caching
+
+`validate_upgrade`, `generate_upgrade_plan`, and `write_upgrade_pr_summary` accept an optional `analysis` object (a previously returned `ProjectAnalysis`). When supplied, the tool skips redundant `analyzeProject()` calls.
+
+### quietOnSuccess
+
+`validate_upgrade` accepts `quietOnSuccess?: boolean`. When true and all checks pass, returns a one-line summary (`"types ✓, lint ○..."`) instead of full validation output.
+
+### Version-aware breaking changes
+
+`find_breaking_changes` filters guide entries by the detected version transition. Guide entries carry `fromMajor`/`toMajor` ranges; only guides matching the current→latest major transition are returned. When versions are unknown, all guides are included as a fallback.
 
 ## Resource contracts
 
