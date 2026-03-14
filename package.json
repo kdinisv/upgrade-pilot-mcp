@@ -3,6 +3,11 @@
   "version": "0.1.11",
   "description": "Workflow-oriented MCP server for safer JS/TS stack upgrades and migrations.",
   "type": "module",
+  "files": [
+    "dist",
+    "docs",
+    "README.md"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kdinisv/upgrade-pilot-mcp.git"
