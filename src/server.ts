@@ -21,6 +21,7 @@ import {
   generateUpgradePlan,
   writeUpgradePrSummary,
 } from "./lib/plan-generator.js";
+import { runUpgradePipeline } from "./lib/pipeline.js";
 import { detectUpgradePaths } from "./lib/upgrade-paths.js";
 import { validateUpgrade } from "./lib/validation.js";
 
@@ -31,6 +32,7 @@ const artifacts: Record<string, unknown> = {
   findings: null,
   plan: null,
   codemods: null,
+  pipeline: null,
   validation: null,
   summary: null,
 };
@@ -163,6 +165,17 @@ server.registerResource(
     mimeType: "application/json",
   },
   async (uri) => resourceResult(uri, artifacts.validation),
+);
+
+server.registerResource(
+  "latest-pipeline",
+  "upgrade://pipeline/latest",
+  {
+    title: "Latest pipeline",
+    description: "Most recent output from run_upgrade_pipeline.",
+    mimeType: "application/json",
+  },
+  async (uri) => resourceResult(uri, artifacts.pipeline),
 );
 
 server.registerResource(
@@ -355,6 +368,36 @@ server.registerTool(
           await validateUpgrade(rootPath, include, timeoutMs),
         ),
       );
+    } catch (error) {
+      return errorResult(error);
+    }
+  },
+);
+
+server.registerTool(
+  "run_upgrade_pipeline",
+  {
+    title: "Run full upgrade pipeline",
+    description:
+      "Run analyze → paths → breaking changes → deprecations → plan in a single call. Returns a compact summary to save tokens while storing all artifacts for later resource access.",
+    inputSchema: z.object({
+      rootPath: z.string().optional(),
+      targets: z.array(z.string()).optional(),
+      skipSteps: z
+        .array(z.enum(["findings", "breakingChanges"]))
+        .optional(),
+    }),
+  },
+  async ({ rootPath, targets, skipSteps }) => {
+    try {
+      const result = await runUpgradePipeline(rootPath, targets, skipSteps);
+      rememberArtifact("pipeline", result);
+      rememberArtifact("analysis", result.analysis);
+      rememberArtifact("paths", result.paths);
+      rememberArtifact("breakingChanges", result.breakingChanges);
+      rememberArtifact("findings", result.findings);
+      rememberArtifact("plan", result.plan);
+      return asToolResult({ summary: result.summary });
     } catch (error) {
       return errorResult(error);
     }

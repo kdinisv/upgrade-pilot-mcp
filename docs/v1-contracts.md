@@ -125,6 +125,21 @@ Output:
 - risk list
 - validation checklist
 
+### run_upgrade_pipeline
+
+Purpose: execute the full diagnostic pipeline (analyze → paths → breaking changes → deprecations → plan) in a single call. Returns a compact text summary to minimize token usage while storing all artifacts for resource access.
+
+Input:
+
+- rootPath: optional absolute path
+- targets: optional subset of supported packages
+- skipSteps: optional list of steps to skip (findings, breakingChanges)
+
+Output:
+
+- compact text summary (project, stack, outdated counts, top risks, plan overview)
+- all artifacts stored internally for resource access
+
 ### apply_safe_codemods
 
 Purpose: execute only deterministic, local, reviewable codemods.
@@ -191,6 +206,7 @@ Resource URIs are intentionally stable and artifact-shaped:
 - upgrade://breaking-changes/latest
 - upgrade://findings/latest
 - upgrade://plan/latest
+- upgrade://pipeline/latest
 - upgrade://codemods/latest
 - upgrade://validation/latest
 - upgrade://summary/latest
