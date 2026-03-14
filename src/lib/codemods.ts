@@ -33,8 +33,7 @@ export async function applySafeCodemods(
         try {
           await fs.writeFile(schemaPath, updatedSchema, "utf8");
         } catch (error) {
-          writeError =
-            error instanceof Error ? error.message : String(error);
+          writeError = error instanceof Error ? error.message : String(error);
         }
       }
 

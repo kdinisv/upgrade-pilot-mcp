@@ -11,17 +11,16 @@ interface CallToolResult {
 }
 
 // Simulates the safeTool wrapper pattern
-function safeTool(
-  fn: () => Promise<unknown>,
-): Promise<CallToolResult> {
+function safeTool(fn: () => Promise<unknown>): Promise<CallToolResult> {
   return fn()
     .then((payload) => ({
-      content: [{ type: "text" as const, text: JSON.stringify(payload, null, 2) }],
+      content: [
+        { type: "text" as const, text: JSON.stringify(payload, null, 2) },
+      ],
       structuredContent: { result: payload },
     }))
     .catch((error: unknown) => {
-      const message =
-        error instanceof Error ? error.message : String(error);
+      const message = error instanceof Error ? error.message : String(error);
       return {
         content: [{ type: "text" as const, text: message }],
         isError: true as const,

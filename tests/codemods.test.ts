@@ -90,8 +90,6 @@ describe("applySafeCodemods", () => {
     const result = await applySafeCodemods(tmpDir, "dry-run", [
       "nonexistent-codemod",
     ]);
-    assert.deepStrictEqual(result.unsupportedCodemods, [
-      "nonexistent-codemod",
-    ]);
+    assert.deepStrictEqual(result.unsupportedCodemods, ["nonexistent-codemod"]);
   });
 });

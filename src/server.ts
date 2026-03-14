@@ -326,7 +326,10 @@ server.registerTool(
   async ({ rootPath, include }) => {
     try {
       return asToolResult(
-        rememberArtifact("validation", await validateUpgrade(rootPath, include)),
+        rememberArtifact(
+          "validation",
+          await validateUpgrade(rootPath, include),
+        ),
       );
     } catch (error) {
       return errorResult(error);

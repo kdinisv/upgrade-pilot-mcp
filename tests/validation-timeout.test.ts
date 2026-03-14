@@ -31,7 +31,7 @@ describe("validateUpgrade timeout handling", () => {
       JSON.stringify({
         name: "hang-test",
         scripts: {
-          test: "node -e \"setTimeout(() => {}, 60000)\"",
+          test: 'node -e "setTimeout(() => {}, 60000)"',
         },
       }),
       "utf8",
