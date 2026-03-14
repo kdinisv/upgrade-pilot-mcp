@@ -1,6 +1,7 @@
 import { exec } from "node:child_process";
 import {
   type PackageManager,
+  type ProjectAnalysis,
   type ValidationCommandResult,
   type ValidationKind,
 } from "../types.js";
@@ -114,15 +115,17 @@ export async function validateUpgrade(
   rootPath = process.cwd(),
   include: ValidationKind[] = ["types", "lint", "test", "build"],
   timeoutMs: number = DEFAULT_TIMEOUT_MS,
+  analysis?: ProjectAnalysis,
 ): Promise<ValidationCommandResult[]> {
-  const analysis = await analyzeProject(rootPath, true);
+  const { packageManager, scripts } =
+    analysis ?? (await analyzeProject(rootPath, true));
   const results: ValidationCommandResult[] = [];
 
   for (const kind of include) {
     const execution = getScriptCommand(
       kind,
-      analysis.packageManager,
-      analysis.scripts,
+      packageManager,
+      scripts,
     );
     if (execution.args.length === 0) {
       results.push({

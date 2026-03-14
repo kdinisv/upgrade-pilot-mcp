@@ -77,6 +77,7 @@ export async function scanRepoForDeprecations(
   const candidateRules = DEPRECATION_RULES.filter((rule) =>
     selectedTargets.has(rule.packageName),
   );
+  if (candidateRules.length === 0) return [];
   const allFiles = await walkFiles(rootPath);
   const findings: DeprecationFinding[] = [];
 

@@ -13,6 +13,7 @@ const require = createRequire(import.meta.url);
 const { version: SERVER_VERSION } = require("../package.json") as {
   version: string;
 };
+import type { ProjectAnalysis } from "./types.js";
 import { analyzeProject } from "./lib/analyzer.js";
 import { findBreakingChanges } from "./lib/breaking-changes.js";
 import { applySafeCodemods } from "./lib/codemods.js";
@@ -77,6 +78,10 @@ function rememberArtifact(
 ): unknown {
   artifacts[key] = payload;
   return payload;
+}
+
+function cachedAnalysis(): ProjectAnalysis | undefined {
+  return (artifacts.analysis as ProjectAnalysis) ?? undefined;
 }
 
 function resourceResult(
@@ -246,7 +251,7 @@ server.registerTool(
   },
   async ({ rootPath, targets, outputFormat }) => {
     try {
-      const result = await detectUpgradePaths(rootPath, targets);
+      const result = await detectUpgradePaths(rootPath, targets, cachedAnalysis());
       rememberArtifact("paths", result);
       return asToolResult(
         outputFormat === "compact" ? compactPaths(result) : result,
@@ -271,7 +276,7 @@ server.registerTool(
   },
   async ({ rootPath, targets, outputFormat }) => {
     try {
-      const result = await findBreakingChanges(rootPath, targets);
+      const result = await findBreakingChanges(rootPath, targets, cachedAnalysis());
       rememberArtifact("breakingChanges", result);
       return asToolResult(
         outputFormat === "compact"
@@ -303,6 +308,7 @@ server.registerTool(
         rootPath,
         targets,
         maxFindings,
+        cachedAnalysis(),
       );
       rememberArtifact("findings", result);
       return asToolResult(
@@ -328,7 +334,7 @@ server.registerTool(
   async ({ rootPath, targets }) => {
     try {
       return asToolResult(
-        rememberArtifact("plan", await generateUpgradePlan(rootPath, targets)),
+        rememberArtifact("plan", await generateUpgradePlan(rootPath, targets, cachedAnalysis())),
       );
     } catch (error) {
       return errorResult(error);
@@ -379,7 +385,7 @@ server.registerTool(
   },
   async ({ rootPath, include, timeoutMs, outputFormat }) => {
     try {
-      const result = await validateUpgrade(rootPath, include, timeoutMs);
+      const result = await validateUpgrade(rootPath, include, timeoutMs, cachedAnalysis());
       rememberArtifact("validation", result);
       return asToolResult(
         outputFormat === "compact" ? compactValidation(result) : result,
@@ -433,7 +439,7 @@ server.registerTool(
   },
   async ({ rootPath, targets }) => {
     try {
-      const markdown = await writeUpgradePrSummary(rootPath, targets);
+      const markdown = await writeUpgradePrSummary(rootPath, targets, cachedAnalysis());
       rememberArtifact("summary", markdown);
       return asToolResult({ markdown });
     } catch (error) {

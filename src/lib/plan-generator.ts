@@ -116,8 +116,9 @@ function buildPlan(
 export async function generateUpgradePlan(
   rootPath = process.cwd(),
   targets?: string[],
+  cachedAnalysis?: ProjectAnalysis,
 ): Promise<UpgradePlan> {
-  const analysis = await analyzeProject(rootPath, true);
+  const analysis = cachedAnalysis ?? (await analyzeProject(rootPath, true));
   const paths = await detectUpgradePaths(rootPath, targets, analysis);
   const breakingChanges = await findBreakingChanges(
     rootPath,
@@ -137,8 +138,9 @@ export async function generateUpgradePlan(
 export async function writeUpgradePrSummary(
   rootPath = process.cwd(),
   targets?: string[],
+  cachedAnalysis?: ProjectAnalysis,
 ): Promise<string> {
-  const analysis = await analyzeProject(rootPath, true);
+  const analysis = cachedAnalysis ?? (await analyzeProject(rootPath, true));
   const paths = await detectUpgradePaths(rootPath, targets, analysis);
   const breakingChanges = await findBreakingChanges(
     rootPath,
