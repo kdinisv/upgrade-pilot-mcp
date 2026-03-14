@@ -48,12 +48,16 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
     packageName: "eslint",
     guides: [
       {
-        title: "ESLint migration guide",
+        title: "ESLint 8→9 migration guide",
         url: "https://eslint.org/docs/latest/use/migrate-to-9.0.0",
+        fromMajor: 8,
+        toMajor: 9,
       },
       {
         title: "ESLint configuration migration",
         url: "https://eslint.org/docs/latest/use/configure/migration-guide",
+        fromMajor: 8,
+        toMajor: 9,
       },
     ],
     risks: [
@@ -78,8 +82,10 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
     packageName: "webpack",
     guides: [
       {
-        title: "Webpack migration guide",
+        title: "Webpack 4→5 migration guide",
         url: "https://webpack.js.org/migrate/5/",
+        fromMajor: 4,
+        toMajor: 5,
       },
     ],
     risks: [
@@ -143,8 +149,10 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
     packageName: "jest",
     guides: [
       {
-        title: "Jest upgrade guide",
+        title: "Jest 29→30 upgrade guide",
         url: "https://jestjs.io/docs/upgrading-to-jest30",
+        fromMajor: 29,
+        toMajor: 30,
       },
     ],
     risks: [
@@ -169,8 +177,10 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
     packageName: "babel",
     guides: [
       {
-        title: "Babel 8 migration guide",
+        title: "Babel 7→8 migration guide",
         url: "https://babeljs.io/docs/v8-migration",
+        fromMajor: 7,
+        toMajor: 8,
       },
     ],
     risks: [
@@ -195,8 +205,16 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
     packageName: "react",
     guides: [
       {
+        title: "React 18 upgrade guide",
+        url: "https://react.dev/blog/2022/03/08/react-18-upgrade-guide",
+        fromMajor: 17,
+        toMajor: 18,
+      },
+      {
         title: "React 19 upgrade guide",
         url: "https://react.dev/blog/2024/04/25/react-19-upgrade-guide",
+        fromMajor: 18,
+        toMajor: 19,
       },
     ],
     risks: [
@@ -208,8 +226,16 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
     packageName: "react-router",
     guides: [
       {
-        title: "React Router upgrading guide",
+        title: "React Router v5→v6 upgrading guide",
+        url: "https://reactrouter.com/upgrading/v5",
+        fromMajor: 5,
+        toMajor: 6,
+      },
+      {
+        title: "React Router v6→v7 upgrading guide",
         url: "https://reactrouter.com/upgrading/v6",
+        fromMajor: 6,
+        toMajor: 7,
       },
     ],
     risks: [
@@ -247,8 +273,16 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
     packageName: "next",
     guides: [
       {
-        title: "Next.js upgrade guide",
+        title: "Next.js 14→15 upgrade guide",
+        url: "https://nextjs.org/docs/app/guides/upgrading/version-15",
+        fromMajor: 14,
+        toMajor: 15,
+      },
+      {
+        title: "Next.js 15→16 upgrade guide",
         url: "https://nextjs.org/docs/app/guides/upgrading/version-16",
+        fromMajor: 15,
+        toMajor: 16,
       },
       {
         title: "Next.js blog",
@@ -264,8 +298,10 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
     packageName: "vue",
     guides: [
       {
-        title: "Vue migration guide",
+        title: "Vue 2→3 migration guide",
         url: "https://v3-migration.vuejs.org/",
+        fromMajor: 2,
+        toMajor: 3,
       },
     ],
     risks: [
@@ -333,8 +369,10 @@ const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
     packageName: "svelte",
     guides: [
       {
-        title: "Svelte 5 migration guide",
+        title: "Svelte 4→5 migration guide",
         url: "https://svelte.dev/docs/svelte/v5-migration-guide",
+        fromMajor: 4,
+        toMajor: 5,
       },
     ],
     risks: [
@@ -771,6 +809,20 @@ function getGuideKey(packageName: string): string {
   return packageName;
 }
 
+type Guide = BreakingChangeReference["guides"][number];
+
+export function filterGuidesByVersion(
+  guides: Guide[],
+  currentMajor: number | null | undefined,
+  targetMajor: number | null | undefined,
+): Guide[] {
+  if (currentMajor == null || targetMajor == null) return guides;
+  return guides.filter((g) => {
+    if (g.fromMajor == null || g.toMajor == null) return true;
+    return g.fromMajor >= currentMajor && g.toMajor <= targetMajor;
+  });
+}
+
 export async function findBreakingChanges(
   rootPath = process.cwd(),
   targets?: string[],
@@ -783,6 +835,18 @@ export async function findBreakingChanges(
       : projectAnalysis.supportedDependencies.map((d) => d.name),
   );
 
+  // Build a version map from supported dependencies for filtering
+  const versionInfo = new Map<string, { currentMajor: number | null }>();
+  for (const dep of projectAnalysis.supportedDependencies) {
+    const key = getGuideKey(dep.name);
+    if (!versionInfo.has(key)) {
+      const match = dep.versionRange.match(/(\d+)/);
+      versionInfo.set(key, {
+        currentMajor: match ? Number(match[1]) : null,
+      });
+    }
+  }
+
   const guideKeys = new Set(
     [...selectedTargets]
       .map((packageName) => getGuideKey(packageName))
@@ -790,7 +854,27 @@ export async function findBreakingChanges(
   );
 
   return [...guideKeys]
-    .map((packageName) => PACKAGE_GUIDES[packageName])
+    .map((key) => {
+      const entry = PACKAGE_GUIDES[key];
+      if (!entry) return null;
+      const info = versionInfo.get(key);
+      const currentMajor = info?.currentMajor ?? null;
+      // Determine latest major from the highest toMajor in guides
+      const latestGuide = entry.guides.reduce<number | null>(
+        (max, g) =>
+          g.toMajor != null ? Math.max(max ?? 0, g.toMajor) : max,
+        null,
+      );
+      const filteredGuides = filterGuidesByVersion(
+        entry.guides,
+        currentMajor,
+        latestGuide,
+      );
+      return {
+        ...entry,
+        guides: filteredGuides.length > 0 ? filteredGuides : entry.guides,
+      };
+    })
     .filter((entry): entry is BreakingChangeReference => Boolean(entry))
     .sort((left, right) => left.packageName.localeCompare(right.packageName));
 }

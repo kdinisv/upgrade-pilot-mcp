@@ -154,6 +154,8 @@ export interface BreakingChangeReference {
   guides: Array<{
     title: string;
     url: string;
+    fromMajor?: number | undefined;
+    toMajor?: number | undefined;
   }>;
   risks: string[];
 }
