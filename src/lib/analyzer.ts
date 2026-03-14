@@ -386,7 +386,8 @@ export async function analyzeProject(
   includeScripts = true,
 ): Promise<ProjectAnalysis> {
   const packageJsonPath = await findFirstExisting(rootPath, ["package.json"]);
-  const lockfile = await findFirstExisting(rootPath, LOCKFILE_CANDIDATES);
+  const allLockfiles = await findAllExisting(rootPath, LOCKFILE_CANDIDATES);
+  const lockfile = allLockfiles[0] ?? null;
   const packageJson = packageJsonPath
     ? await readJsoncFile<PackageJsonShape>(packageJsonPath)
     : null;
@@ -398,6 +399,13 @@ export async function analyzeProject(
     isSupportedDependency(d.name),
   );
   const warnings: string[] = [];
+
+  if (allLockfiles.length > 1) {
+    const names = allLockfiles.map((lf) => relativeTo(rootPath, lf));
+    warnings.push(
+      `Multiple lockfiles detected (${names.join(", ")}). This may cause inconsistent installs — consider removing the ones you do not use.`,
+    );
+  }
 
   if (!packageJsonPath) {
     warnings.push("package.json was not found at the provided rootPath.");
