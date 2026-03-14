@@ -27,6 +27,7 @@ import {
 } from "./lib/compact.js";
 import { scanRepoForDeprecations } from "./lib/deprecation-scanner.js";
 import { installUpgrade } from "./lib/installer.js";
+import { checkPeerCompatibility } from "./lib/compatibility.js";
 import {
   generateUpgradePlan,
   writeUpgradePrSummary,
@@ -477,6 +478,30 @@ server.registerTool(
         cachedAnalysis(),
       );
       return asToolResult(result);
+    } catch (error) {
+      return errorResult(error);
+    }
+  },
+);
+
+server.registerTool(
+  "check_compatibility",
+  {
+    title: "Check peer dependency compatibility",
+    description:
+      "Verify peerDependency compatibility for a set of packages before installing.",
+    inputSchema: z.object({
+      packages: z.array(
+        z.object({
+          name: z.string(),
+          version: z.string(),
+        }),
+      ),
+    }),
+  },
+  async ({ packages }) => {
+    try {
+      return asToolResult(await checkPeerCompatibility(packages));
     } catch (error) {
       return errorResult(error);
     }
