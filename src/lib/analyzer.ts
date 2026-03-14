@@ -1,3 +1,4 @@
+import path from "node:path";
 import {
   type ConfigPresence,
   type DependencyEntry,
@@ -10,6 +11,7 @@ import {
   findAllExisting,
   findFirstExisting,
   readJsoncFile,
+  fileExists,
   relativeTo,
 } from "./fs-utils.js";
 
@@ -440,8 +442,9 @@ export async function analyzeProject(
     configPresence,
     detectedStack: detectStack(dependencies, configPresence),
     isWorkspace:
-      packageJson?.workspaces != null &&
-      typeof packageJson.workspaces === "object",
+      (packageJson?.workspaces != null &&
+        typeof packageJson.workspaces === "object") ||
+      (await fileExists(path.join(rootPath, "pnpm-workspace.yaml"))),
     warnings,
   };
 }
