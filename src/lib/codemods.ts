@@ -28,15 +28,23 @@ export async function applySafeCodemods(
       const replacements = countRegexMatches(schema, matcher);
       const updatedSchema = schema.replaceAll(matcher, "relationMode$1");
       const changed = updatedSchema !== schema;
+      let writeError: string | undefined;
       if (changed && mode === "apply") {
-        await fs.writeFile(schemaPath, updatedSchema, "utf8");
+        try {
+          await fs.writeFile(schemaPath, updatedSchema, "utf8");
+        } catch (error) {
+          writeError =
+            error instanceof Error ? error.message : String(error);
+        }
       }
 
+      const applied = mode === "apply" && changed && !writeError;
       changes.push({
         codemodId: "prisma-relation-mode",
         filePath: relativeTo(rootPath, schemaPath),
         replacements,
-        changed: mode === "apply" ? changed : false,
+        changed: applied,
+        ...(writeError ? { error: writeError } : {}),
       });
     }
   }

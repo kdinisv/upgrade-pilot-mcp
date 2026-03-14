@@ -188,6 +188,7 @@ export interface CodemodChange {
   filePath: string;
   replacements: number;
   changed: boolean;
+  error?: string;
 }
 
 export interface ValidationCommandResult {
