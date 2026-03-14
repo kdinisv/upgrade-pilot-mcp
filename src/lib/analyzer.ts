@@ -375,12 +375,16 @@ function detectStack(
 }
 
 async function detectConfigPresence(rootPath: string): Promise<ConfigPresence> {
+  const keys = Object.keys(CONFIG_REGISTRY) as Array<keyof ConfigPresence>;
+  const entries = await Promise.all(
+    keys.map(async (key) => {
+      const found = await findAllExisting(rootPath, CONFIG_REGISTRY[key]);
+      return [key, found.map((fp) => relativeTo(rootPath, fp))] as const;
+    }),
+  );
   const result = {} as ConfigPresence;
-  for (const key of Object.keys(CONFIG_REGISTRY) as Array<
-    keyof ConfigPresence
-  >) {
-    const found = await findAllExisting(rootPath, CONFIG_REGISTRY[key]);
-    result[key] = found.map((fp) => relativeTo(rootPath, fp));
+  for (const [key, value] of entries) {
+    result[key] = value;
   }
   return result;
 }
