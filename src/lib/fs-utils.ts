@@ -1,6 +1,6 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { parse } from "jsonc-parser";
+import { parse, type ParseError } from "jsonc-parser";
 
 const DEFAULT_IGNORES = new Set([
   ".git",
@@ -38,11 +38,16 @@ export async function readTextIfExists(
 
 export async function readJsoncFile<T>(filePath: string): Promise<T | null> {
   const text = await readTextIfExists(filePath);
-  if (text === null) {
+  if (text === null || text.trim() === "") {
     return null;
   }
 
-  return parse(text) as T;
+  const errors: ParseError[] = [];
+  const parsed = parse(text, errors) as T;
+  if (errors.length > 0 || parsed === undefined || parsed === null) {
+    return null;
+  }
+  return parsed;
 }
 
 export async function findFirstExisting(
