@@ -16,6 +16,13 @@ const { version: SERVER_VERSION } = require("../package.json") as {
 import { analyzeProject } from "./lib/analyzer.js";
 import { findBreakingChanges } from "./lib/breaking-changes.js";
 import { applySafeCodemods } from "./lib/codemods.js";
+import {
+  compactAnalysis,
+  compactBreakingChanges,
+  compactFindings,
+  compactPaths,
+  compactValidation,
+} from "./lib/compact.js";
 import { scanRepoForDeprecations } from "./lib/deprecation-scanner.js";
 import {
   generateUpgradePlan,
@@ -209,15 +216,15 @@ server.registerTool(
     inputSchema: z.object({
       rootPath: z.string().optional(),
       includeScripts: z.boolean().default(true),
+      outputFormat: z.enum(["full", "compact"]).default("compact"),
     }),
   },
-  async ({ rootPath, includeScripts }) => {
+  async ({ rootPath, includeScripts, outputFormat }) => {
     try {
+      const result = await analyzeProject(rootPath, includeScripts);
+      rememberArtifact("analysis", result);
       return asToolResult(
-        rememberArtifact(
-          "analysis",
-          await analyzeProject(rootPath, includeScripts),
-        ),
+        outputFormat === "compact" ? compactAnalysis(result) : result,
       );
     } catch (error) {
       return errorResult(error);
@@ -234,12 +241,15 @@ server.registerTool(
     inputSchema: z.object({
       rootPath: z.string().optional(),
       targets: z.array(z.string()).optional(),
+      outputFormat: z.enum(["full", "compact"]).default("compact"),
     }),
   },
-  async ({ rootPath, targets }) => {
+  async ({ rootPath, targets, outputFormat }) => {
     try {
+      const result = await detectUpgradePaths(rootPath, targets);
+      rememberArtifact("paths", result);
       return asToolResult(
-        rememberArtifact("paths", await detectUpgradePaths(rootPath, targets)),
+        outputFormat === "compact" ? compactPaths(result) : result,
       );
     } catch (error) {
       return errorResult(error);
@@ -256,15 +266,17 @@ server.registerTool(
     inputSchema: z.object({
       rootPath: z.string().optional(),
       targets: z.array(z.string()).optional(),
+      outputFormat: z.enum(["full", "compact"]).default("compact"),
     }),
   },
-  async ({ rootPath, targets }) => {
+  async ({ rootPath, targets, outputFormat }) => {
     try {
+      const result = await findBreakingChanges(rootPath, targets);
+      rememberArtifact("breakingChanges", result);
       return asToolResult(
-        rememberArtifact(
-          "breakingChanges",
-          await findBreakingChanges(rootPath, targets),
-        ),
+        outputFormat === "compact"
+          ? compactBreakingChanges(result)
+          : result,
       );
     } catch (error) {
       return errorResult(error);
@@ -282,15 +294,19 @@ server.registerTool(
       rootPath: z.string().optional(),
       targets: z.array(z.string()).optional(),
       maxFindings: z.number().int().positive().default(100),
+      outputFormat: z.enum(["full", "compact"]).default("compact"),
     }),
   },
-  async ({ rootPath, targets, maxFindings }) => {
+  async ({ rootPath, targets, maxFindings, outputFormat }) => {
     try {
+      const result = await scanRepoForDeprecations(
+        rootPath,
+        targets,
+        maxFindings,
+      );
+      rememberArtifact("findings", result);
       return asToolResult(
-        rememberArtifact(
-          "findings",
-          await scanRepoForDeprecations(rootPath, targets, maxFindings),
-        ),
+        outputFormat === "compact" ? compactFindings(result) : result,
       );
     } catch (error) {
       return errorResult(error);
@@ -358,15 +374,15 @@ server.registerTool(
         .array(z.enum(["types", "lint", "test", "build"]))
         .default(["types", "lint", "test", "build"]),
       timeoutMs: z.number().int().positive().optional(),
+      outputFormat: z.enum(["full", "compact"]).default("compact"),
     }),
   },
-  async ({ rootPath, include, timeoutMs }) => {
+  async ({ rootPath, include, timeoutMs, outputFormat }) => {
     try {
+      const result = await validateUpgrade(rootPath, include, timeoutMs);
+      rememberArtifact("validation", result);
       return asToolResult(
-        rememberArtifact(
-          "validation",
-          await validateUpgrade(rootPath, include, timeoutMs),
-        ),
+        outputFormat === "compact" ? compactValidation(result) : result,
       );
     } catch (error) {
       return errorResult(error);
