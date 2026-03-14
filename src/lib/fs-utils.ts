@@ -3,14 +3,19 @@ import path from "node:path";
 import { parse, type ParseError } from "jsonc-parser";
 
 const DEFAULT_IGNORES = new Set([
+  ".cache",
   ".git",
   ".next",
   ".nuxt",
   ".output",
+  ".svelte-kit",
   ".turbo",
+  ".vite",
+  "build",
   "coverage",
   "dist",
   "node_modules",
+  "out",
 ]);
 
 export function toPosixPath(filePath: string): string {
