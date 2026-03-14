@@ -7,14 +7,14 @@ V1 is a workflow MCP for popular JS/TS upgrade routes:
 - package manager driven Node.js repositories
 - TypeScript present or planned
 - ESLint, Prettier
-- PostCSS, Webpack, Rollup, esbuild, tsup
+- PostCSS, Sass, Webpack, Rollup, esbuild, tsup
 - Vite, Vitest, Jest, Mocha
 - Babel, SWC
 - React, React DOM, Next.js, React Router, Redux Toolkit, TanStack Query
 - Vue, Vue Router, Pinia, Nuxt
 - Astro, Svelte, SvelteKit, Remix
 - Tailwind CSS, Storybook
-- Playwright, Cypress
+- Playwright, Cypress, Supertest, MSW
 - Prisma
 - Express, Fastify, Hono, NestJS
 - GraphQL, Socket.IO
@@ -54,8 +54,9 @@ Output:
 - scripts
 - dependency snapshot for supported packages
 - config-file presence for TypeScript, ESLint, Prettier, PostCSS, Webpack, Rollup, Vite, Vitest, Jest, Mocha, Babel, SWC, Next, Nuxt, Astro, SvelteKit, Tailwind, Playwright, Cypress, Storybook, Husky, lint-staged, commitlint, Turbo, Nx, Nest, Remix, Angular, Prisma
+- workspace detection (npm/yarn workspaces field and pnpm-workspace.yaml)
 - detected stack tags
-- warnings and upgrade readiness notes
+- warnings and upgrade readiness notes (including multiple-lockfile conflicts)
 
 ### detect_upgrade_paths
 
@@ -139,6 +140,7 @@ Output:
 - detected codemod candidates
 - per-file replacements
 - whether files were changed
+- error message when a file write fails in apply mode
 - unsupported codemod requests
 
 V1 codemods:
@@ -153,12 +155,13 @@ Input:
 
 - rootPath: optional absolute path
 - include: optional list of validations from types, lint, test, build
+- timeoutMs: optional command timeout in milliseconds, defaults to 300 000 (5 minutes)
 
 Output:
 
 - executed commands
 - exit codes
-- stdout and stderr excerpts
+- stdout and stderr excerpts (head + tail preserved when truncated)
 - overall pass/fail summary
 - skipped validations with reasons
 
