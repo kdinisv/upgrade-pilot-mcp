@@ -16,10 +16,7 @@ describe("analyzeProject stack detection for missing packages", () => {
     await fs.rm(tmpDir, { recursive: true, force: true });
   });
 
-  async function createProjectWith(
-    name: string,
-    deps: Record<string, string>,
-  ) {
+  async function createProjectWith(name: string, deps: Record<string, string>) {
     const projectDir = path.join(tmpDir, name);
     await fs.mkdir(projectDir, { recursive: true });
     await fs.writeFile(
