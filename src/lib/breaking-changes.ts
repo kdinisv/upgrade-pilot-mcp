@@ -5,6 +5,19 @@ import {
 import { analyzeProject } from "./analyzer.js";
 
 const PACKAGE_GUIDES: Record<string, BreakingChangeReference> = {
+  sass: {
+    packageName: "sass",
+    guides: [
+      {
+        title: "Dart Sass releases",
+        url: "https://github.com/sass/dart-sass/releases",
+      },
+    ],
+    risks: [
+      "Deprecation warnings for legacy APIs can become hard errors across major versions.",
+      "Color function and import behavior should be revalidated after Sass upgrades.",
+    ],
+  },
   postcss: {
     packageName: "postcss",
     guides: [
