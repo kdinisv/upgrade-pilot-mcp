@@ -28,7 +28,10 @@ describe("findBreakingChanges sass guide", () => {
     const results = await findBreakingChanges(tmpDir, ["sass"]);
     const sassEntry = results.find((r) => r.packageName === "sass");
     assert.ok(sassEntry, "sass entry should exist in breaking changes");
-    assert.ok(sassEntry.guides.length > 0, "sass should have at least one guide");
+    assert.ok(
+      sassEntry.guides.length > 0,
+      "sass should have at least one guide",
+    );
     assert.ok(sassEntry.risks.length > 0, "sass should have at least one risk");
   });
 });
