@@ -1,9 +1,13 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { type CodemodChange } from "../types.js";
-import { countRegexMatches, readTextIfExists, relativeTo } from "./fs-utils.js";
+import { countRegexMatches, readTextIfExists, relativeTo, walkFiles } from "./fs-utils.js";
 
-const KNOWN_CODEMODS = new Set(["prisma-relation-mode", "eslint-flat-config"]);
+const KNOWN_CODEMODS = new Set([
+  "prisma-relation-mode",
+  "eslint-flat-config",
+  "tailwind-v4-import",
+]);
 
 export async function applySafeCodemods(
   rootPath = process.cwd(),
@@ -100,6 +104,40 @@ export async function applySafeCodemods(
           changed: mode === "apply",
         });
       }
+    }
+  }
+
+  if (selectedCodemods.has("tailwind-v4-import")) {
+    const cssFiles = (await walkFiles(rootPath)).filter((f) =>
+      /\.css$/i.test(f),
+    );
+    const tw3Directive =
+      /^@tailwind\s+(base|components|utilities)\s*;?\s*$/gm;
+    const tw3Import =
+      /^@import\s+['"]tailwindcss\/(base|components|utilities)['"].*;?\s*$/gm;
+    for (const absPath of cssFiles) {
+      const content = await readTextIfExists(absPath);
+      if (content === null) continue;
+      const directiveCount = countRegexMatches(content, tw3Directive);
+      const importCount = countRegexMatches(content, tw3Import);
+      const total = directiveCount + importCount;
+      if (total === 0) continue;
+      let updated = content
+        .replace(tw3Directive, "")
+        .replace(tw3Import, "");
+      // Remove empty lines left behind, but preserve a single newline
+      updated = updated.replace(/\n{3,}/g, "\n\n");
+      // Prepend the v4 import at the top
+      updated = '@import "tailwindcss";\n' + updated.replace(/^\n+/, "\n");
+      if (mode === "apply") {
+        await fs.writeFile(absPath, updated, "utf8");
+      }
+      changes.push({
+        codemodId: "tailwind-v4-import",
+        filePath: relativeTo(rootPath, absPath),
+        replacements: total,
+        changed: mode === "apply",
+      });
     }
   }
 
