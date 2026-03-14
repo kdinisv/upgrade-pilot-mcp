@@ -105,3 +105,20 @@ export function compactValidation(
     return base;
   });
 }
+
+const STATUS_ICON: Record<string, string> = {
+  passed: "✓",
+  skipped: "○",
+  failed: "✗",
+};
+
+export function quietValidation(
+  results: ValidationCommandResult[],
+): { allPassed: true; summary: string } | CompactValidation[] {
+  const hasFailed = results.some((r) => r.status === "failed");
+  if (hasFailed) return compactValidation(results);
+  const summary = results
+    .map((r) => `${r.kind} ${STATUS_ICON[r.status] ?? r.status}`)
+    .join(", ");
+  return { allPassed: true, summary };
+}

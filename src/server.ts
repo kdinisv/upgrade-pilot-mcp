@@ -23,6 +23,7 @@ import {
   compactFindings,
   compactPaths,
   compactValidation,
+  quietValidation,
 } from "./lib/compact.js";
 import { scanRepoForDeprecations } from "./lib/deprecation-scanner.js";
 import {
@@ -381,12 +382,14 @@ server.registerTool(
         .default(["types", "lint", "test", "build"]),
       timeoutMs: z.number().int().positive().optional(),
       outputFormat: z.enum(["full", "compact"]).default("compact"),
+      quietOnSuccess: z.boolean().default(true),
     }),
   },
-  async ({ rootPath, include, timeoutMs, outputFormat }) => {
+  async ({ rootPath, include, timeoutMs, outputFormat, quietOnSuccess }) => {
     try {
       const result = await validateUpgrade(rootPath, include, timeoutMs, cachedAnalysis());
       rememberArtifact("validation", result);
+      if (quietOnSuccess) return asToolResult(quietValidation(result));
       return asToolResult(
         outputFormat === "compact" ? compactValidation(result) : result,
       );
