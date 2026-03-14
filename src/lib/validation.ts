@@ -1,4 +1,4 @@
-import { spawn } from "node:child_process";
+import { exec } from "node:child_process";
 import {
   type PackageManager,
   type ValidationCommandResult,
@@ -18,31 +18,37 @@ function spawnCommand(
   command: string,
   args: string[],
   cwd: string,
+  timeoutMs: number,
 ): Promise<{ exitCode: number | null; stdout: string; stderr: string }> {
+  const fullCommand = [command, ...args].join(" ");
   return new Promise((resolve) => {
-    const child = spawn(command, args, {
-      cwd,
-      shell: false,
-      windowsHide: true,
-      env: process.env,
-    });
-
-    let stdout = "";
-    let stderr = "";
-
-    child.stdout.on("data", (chunk) => {
-      stdout += chunk.toString();
-    });
-    child.stderr.on("data", (chunk) => {
-      stderr += chunk.toString();
-    });
-    child.on("error", (error) => {
-      stderr += error.message;
-      resolve({ exitCode: null, stdout, stderr });
-    });
-    child.on("close", (exitCode) => {
-      resolve({ exitCode, stdout, stderr });
-    });
+    const child = exec(
+      fullCommand,
+      {
+        cwd,
+        windowsHide: true,
+        env: process.env,
+        timeout: timeoutMs,
+        maxBuffer: 16 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        if (error && error.killed) {
+          resolve({
+            exitCode: null,
+            stdout,
+            stderr:
+              stderr +
+              `\nProcess timeout: command exceeded ${timeoutMs}ms and was killed.`,
+          });
+          return;
+        }
+        resolve({
+          exitCode: child.exitCode,
+          stdout,
+          stderr,
+        });
+      },
+    );
   });
 }
 
@@ -91,9 +97,12 @@ function getScriptCommand(
   return { command, args: [], reason: "No build script detected." };
 }
 
+const DEFAULT_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+
 export async function validateUpgrade(
   rootPath = process.cwd(),
   include: ValidationKind[] = ["types", "lint", "test", "build"],
+  timeoutMs: number = DEFAULT_TIMEOUT_MS,
 ): Promise<ValidationCommandResult[]> {
   const analysis = await analyzeProject(rootPath, true);
   const results: ValidationCommandResult[] = [];
@@ -121,6 +130,7 @@ export async function validateUpgrade(
       execution.command,
       execution.args,
       rootPath,
+      timeoutMs,
     );
     results.push({
       kind,
