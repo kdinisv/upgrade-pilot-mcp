@@ -6,6 +6,17 @@ import {
 } from "../types.js";
 import { analyzeProject } from "./analyzer.js";
 
+const TRUNCATION_MARKER = "\n\n...[TRUNCATED]...\n\n";
+
+export function truncateOutput(text: string, limit = 12000): string {
+  if (text.length <= limit) {
+    return text;
+  }
+  const markerLen = TRUNCATION_MARKER.length;
+  const half = Math.floor((limit - markerLen) / 2);
+  return text.slice(0, half) + TRUNCATION_MARKER + text.slice(-half);
+}
+
 function getPackageManagerCommand(packageManager: PackageManager): string {
   const command = packageManager === "unknown" ? "npm" : packageManager;
   if (process.platform === "win32") {
@@ -137,8 +148,8 @@ export async function validateUpgrade(
       command: [execution.command, ...execution.args].join(" "),
       exitCode: result.exitCode,
       status: result.exitCode === 0 ? "passed" : "failed",
-      stdout: result.stdout.slice(-12000),
-      stderr: result.stderr.slice(-12000),
+      stdout: truncateOutput(result.stdout),
+      stderr: truncateOutput(result.stderr),
     });
   }
 
