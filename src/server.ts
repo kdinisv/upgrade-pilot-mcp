@@ -327,14 +327,15 @@ server.registerTool(
       include: z
         .array(z.enum(["types", "lint", "test", "build"]))
         .default(["types", "lint", "test", "build"]),
+      timeoutMs: z.number().int().positive().optional(),
     }),
   },
-  async ({ rootPath, include }) => {
+  async ({ rootPath, include, timeoutMs }) => {
     try {
       return asToolResult(
         rememberArtifact(
           "validation",
-          await validateUpgrade(rootPath, include),
+          await validateUpgrade(rootPath, include, timeoutMs),
         ),
       );
     } catch (error) {
