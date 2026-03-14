@@ -26,6 +26,7 @@ import {
   quietValidation,
 } from "./lib/compact.js";
 import { scanRepoForDeprecations } from "./lib/deprecation-scanner.js";
+import { installUpgrade } from "./lib/installer.js";
 import {
   generateUpgradePlan,
   writeUpgradePrSummary,
@@ -445,6 +446,37 @@ server.registerTool(
       const markdown = await writeUpgradePrSummary(rootPath, targets, cachedAnalysis());
       rememberArtifact("summary", markdown);
       return asToolResult({ markdown });
+    } catch (error) {
+      return errorResult(error);
+    }
+  },
+);
+
+server.registerTool(
+  "install_upgrade",
+  {
+    title: "Install package upgrades",
+    description:
+      "Install specific package versions using the detected package manager (npm/yarn/pnpm).",
+    inputSchema: z.object({
+      rootPath: z.string().optional(),
+      packages: z.array(
+        z.object({
+          name: z.string(),
+          version: z.string(),
+          dev: z.boolean().optional(),
+        }),
+      ),
+    }),
+  },
+  async ({ rootPath, packages }) => {
+    try {
+      const result = await installUpgrade(
+        rootPath,
+        packages,
+        cachedAnalysis(),
+      );
+      return asToolResult(result);
     } catch (error) {
       return errorResult(error);
     }
