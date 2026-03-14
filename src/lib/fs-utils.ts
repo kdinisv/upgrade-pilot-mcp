@@ -29,11 +29,18 @@ export async function fileExists(filePath: string): Promise<boolean> {
 export async function readTextIfExists(
   filePath: string,
 ): Promise<string | null> {
-  if (!(await fileExists(filePath))) {
-    return null;
+  try {
+    return await fs.readFile(filePath, "utf8");
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      "code" in error &&
+      (error as NodeJS.ErrnoException).code === "ENOENT"
+    ) {
+      return null;
+    }
+    throw error;
   }
-
-  return fs.readFile(filePath, "utf8");
 }
 
 export async function readJsoncFile<T>(filePath: string): Promise<T | null> {

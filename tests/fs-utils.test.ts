@@ -3,7 +3,40 @@ import assert from "node:assert/strict";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import os from "node:os";
-import { readJsoncFile } from "../src/lib/fs-utils.js";
+import { readJsoncFile, readTextIfExists } from "../src/lib/fs-utils.js";
+
+describe("readTextIfExists", () => {
+  let tmpDir: string;
+
+  before(async () => {
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "upilot-txt-"));
+  });
+
+  after(async () => {
+    await fs.rm(tmpDir, { recursive: true, force: true });
+  });
+
+  it("should return file contents when file exists", async () => {
+    const filePath = path.join(tmpDir, "hello.txt");
+    await fs.writeFile(filePath, "hello world", "utf8");
+
+    const result = await readTextIfExists(filePath);
+    assert.strictEqual(result, "hello world");
+  });
+
+  it("should return null for non-existent file", async () => {
+    const result = await readTextIfExists(path.join(tmpDir, "nope.txt"));
+    assert.strictEqual(result, null);
+  });
+
+  it("should return null for deleted file (no ENOENT throw)", async () => {
+    // This tests the TOCTOU fix: even if a path "could" exist,
+    // if it's gone by the time we read, we get null, not an exception.
+    const filePath = path.join(tmpDir, "ghost.txt");
+    const result = await readTextIfExists(filePath);
+    assert.strictEqual(result, null);
+  });
+});
 
 describe("readJsoncFile", () => {
   let tmpDir: string;
