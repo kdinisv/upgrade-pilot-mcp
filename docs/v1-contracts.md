@@ -191,6 +191,7 @@ Resource URIs are intentionally stable and artifact-shaped:
 - upgrade://breaking-changes/latest
 - upgrade://findings/latest
 - upgrade://plan/latest
+- upgrade://codemods/latest
 - upgrade://validation/latest
 - upgrade://summary/latest
 

@@ -30,6 +30,7 @@ const artifacts: Record<string, unknown> = {
   breakingChanges: null,
   findings: null,
   plan: null,
+  codemods: null,
   validation: null,
   summary: null,
 };
@@ -162,6 +163,17 @@ server.registerResource(
     mimeType: "application/json",
   },
   async (uri) => resourceResult(uri, artifacts.validation),
+);
+
+server.registerResource(
+  "latest-codemods",
+  "upgrade://codemods/latest",
+  {
+    title: "Latest codemods",
+    description: "Most recent output from apply_safe_codemods.",
+    mimeType: "application/json",
+  },
+  async (uri) => resourceResult(uri, artifacts.codemods),
 );
 
 server.registerResource(
@@ -309,7 +321,12 @@ server.registerTool(
   },
   async ({ rootPath, mode, codemodIds }) => {
     try {
-      return asToolResult(await applySafeCodemods(rootPath, mode, codemodIds));
+      return asToolResult(
+        rememberArtifact(
+          "codemods",
+          await applySafeCodemods(rootPath, mode, codemodIds),
+        ),
+      );
     } catch (error) {
       return errorResult(error);
     }
