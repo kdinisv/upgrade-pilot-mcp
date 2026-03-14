@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { createRequire } from "node:module";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import type {
@@ -7,6 +8,11 @@ import type {
   ReadResourceResult,
 } from "@modelcontextprotocol/sdk/types.js";
 import * as z from "zod/v4";
+
+const require = createRequire(import.meta.url);
+const { version: SERVER_VERSION } = require("../package.json") as {
+  version: string;
+};
 import { analyzeProject } from "./lib/analyzer.js";
 import { findBreakingChanges } from "./lib/breaking-changes.js";
 import { applySafeCodemods } from "./lib/codemods.js";
@@ -31,7 +37,7 @@ const artifacts: Record<string, unknown> = {
 const server = new McpServer(
   {
     name: "upgrade-pilot-mcp",
-    version: "0.1.0",
+    version: SERVER_VERSION,
   },
   {
     capabilities: {
