@@ -1,6 +1,6 @@
 {
   "name": "upgrade-pilot-mcp",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "Workflow-oriented MCP server for safer JS/TS stack upgrades and migrations.",
   "license": "MIT",
   "type": "module",
