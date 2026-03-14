@@ -1,7 +1,12 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { type CodemodChange } from "../types.js";
-import { countRegexMatches, readTextIfExists, relativeTo, walkFiles } from "./fs-utils.js";
+import {
+  countRegexMatches,
+  readTextIfExists,
+  relativeTo,
+  walkFiles,
+} from "./fs-utils.js";
 
 const KNOWN_CODEMODS = new Set([
   "prisma-relation-mode",
@@ -19,9 +24,7 @@ export async function applySafeCodemods(
   unsupportedCodemods: string[];
 }> {
   const selectedCodemods = new Set(
-    codemodIds && codemodIds.length > 0
-      ? codemodIds
-      : [...KNOWN_CODEMODS],
+    codemodIds && codemodIds.length > 0 ? codemodIds : [...KNOWN_CODEMODS],
   );
   const unsupportedCodemods = [...selectedCodemods].filter(
     (id) => !KNOWN_CODEMODS.has(id),
@@ -78,8 +81,8 @@ export async function applySafeCodemods(
           null;
       if (!flatExists) {
         const stub = [
-          '// Auto-generated flat config bridge. Review and customise.',
-          '// See https://eslint.org/docs/latest/use/configure/migration-guide',
+          "// Auto-generated flat config bridge. Review and customise.",
+          "// See https://eslint.org/docs/latest/use/configure/migration-guide",
           'import { FlatCompat } from "@eslint/eslintrc";',
           'import path from "node:path";',
           'import { fileURLToPath } from "node:url";',
@@ -111,8 +114,7 @@ export async function applySafeCodemods(
     const cssFiles = (await walkFiles(rootPath)).filter((f) =>
       /\.css$/i.test(f),
     );
-    const tw3Directive =
-      /^@tailwind\s+(base|components|utilities)\s*;?\s*$/gm;
+    const tw3Directive = /^@tailwind\s+(base|components|utilities)\s*;?\s*$/gm;
     const tw3Import =
       /^@import\s+['"]tailwindcss\/(base|components|utilities)['"].*;?\s*$/gm;
     for (const absPath of cssFiles) {
@@ -122,9 +124,7 @@ export async function applySafeCodemods(
       const importCount = countRegexMatches(content, tw3Import);
       const total = directiveCount + importCount;
       if (total === 0) continue;
-      let updated = content
-        .replace(tw3Directive, "")
-        .replace(tw3Import, "");
+      let updated = content.replace(tw3Directive, "").replace(tw3Import, "");
       // Remove empty lines left behind, but preserve a single newline
       updated = updated.replace(/\n{3,}/g, "\n\n");
       // Prepend the v4 import at the top

@@ -41,13 +41,11 @@ describe("runUpgradePipeline", () => {
   it("should return a compact summary string", async () => {
     const result = await runUpgradePipeline(tmpDir);
 
-    assert.ok(
-      typeof result.summary === "string",
-      "summary should be a string",
-    );
+    assert.ok(typeof result.summary === "string", "summary should be a string");
     assert.ok(result.summary.length > 0, "summary should not be empty");
     assert.ok(
-      result.summary.includes("typescript") || result.summary.includes("eslint"),
+      result.summary.includes("typescript") ||
+        result.summary.includes("eslint"),
       "summary should mention detected packages",
     );
   });
@@ -67,11 +65,13 @@ describe("runUpgradePipeline", () => {
   });
 
   it("should skip steps when requested", async () => {
-    const result = await runUpgradePipeline(tmpDir, undefined, [
-      "findings",
-    ]);
+    const result = await runUpgradePipeline(tmpDir, undefined, ["findings"]);
 
-    assert.strictEqual(result.findings.length, 0, "findings should be empty when skipped");
+    assert.strictEqual(
+      result.findings.length,
+      0,
+      "findings should be empty when skipped",
+    );
     assert.ok(result.analysis, "analysis should still be present");
     assert.ok(result.paths.length > 0, "paths should still be computed");
   });

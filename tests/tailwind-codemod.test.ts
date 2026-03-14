@@ -68,10 +68,7 @@ describe("tailwind-v4-import codemod", () => {
   it("should replace @import tailwindcss/* directives", async () => {
     tmpDir = await makeTmp();
     await fs.mkdir(path.join(tmpDir, "src"), { recursive: true });
-    await fs.writeFile(
-      path.join(tmpDir, "src/globals.css"),
-      LEGACY_IMPORT_CSS,
-    );
+    await fs.writeFile(path.join(tmpDir, "src/globals.css"), LEGACY_IMPORT_CSS);
     const result = await applySafeCodemods(tmpDir, "apply", [
       "tailwind-v4-import",
     ]);

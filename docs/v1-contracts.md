@@ -161,8 +161,8 @@ Output:
 V1 codemods:
 
 - prisma-relation-mode: rename referentialIntegrity to relationMode in schema.prisma
-- eslint-flat-config: generate eslint.config.mjs FlatCompat bridge from legacy .eslintrc.* files
-- tailwind-v4-import: replace @tailwind base/components/utilities and @import tailwindcss/* with @import "tailwindcss"
+- eslint-flat-config: generate eslint.config.mjs FlatCompat bridge from legacy .eslintrc.\* files
+- tailwind-v4-import: replace @tailwind base/components/utilities and @import tailwindcss/\* with @import "tailwindcss"
 
 ### validate_upgrade
 

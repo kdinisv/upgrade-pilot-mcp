@@ -54,7 +54,12 @@ describe("analysis caching – pass pre-built analysis", () => {
   });
 
   it("validateUpgrade uses provided analysis and skips all when no scripts", async () => {
-    const result = await validateUpgrade("/fake", ["types"], undefined, fakeAnalysis);
+    const result = await validateUpgrade(
+      "/fake",
+      ["types"],
+      undefined,
+      fakeAnalysis,
+    );
     assert.equal(result.length, 1);
     assert.equal(result[0].status, "skipped");
     assert.equal(result[0].kind, "types");

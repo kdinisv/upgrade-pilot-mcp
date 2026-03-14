@@ -36,12 +36,33 @@ describe("compact output helpers", () => {
       configPresence: {
         tsconfig: ["tsconfig.json"],
         eslint: [".eslintrc.js"],
-        prettier: [], postcss: [], webpack: [], rollup: [],
-        vite: [], vitest: [], jest: ["jest.config.js"], mocha: [],
-        babel: [], swc: [], next: [], nuxt: [], astro: [], svelte: [],
-        tailwind: [], playwright: [], cypress: [], storybook: [],
-        husky: [], lintStaged: [], commitlint: [], turbo: [], nx: [],
-        nest: [], remix: [], angular: [], prisma: [],
+        prettier: [],
+        postcss: [],
+        webpack: [],
+        rollup: [],
+        vite: [],
+        vitest: [],
+        jest: ["jest.config.js"],
+        mocha: [],
+        babel: [],
+        swc: [],
+        next: [],
+        nuxt: [],
+        astro: [],
+        svelte: [],
+        tailwind: [],
+        playwright: [],
+        cypress: [],
+        storybook: [],
+        husky: [],
+        lintStaged: [],
+        commitlint: [],
+        turbo: [],
+        nx: [],
+        nest: [],
+        remix: [],
+        angular: [],
+        prisma: [],
       },
       detectedStack: ["react", "typescript", "jest"],
       isWorkspace: false,
@@ -52,7 +73,11 @@ describe("compact output helpers", () => {
 
     assert.strictEqual(compact.packageName, "my-app");
     assert.strictEqual(compact.packageManager, "npm");
-    assert.deepStrictEqual(compact.detectedStack, ["react", "typescript", "jest"]);
+    assert.deepStrictEqual(compact.detectedStack, [
+      "react",
+      "typescript",
+      "jest",
+    ]);
     assert.deepStrictEqual(compact.warnings, ["Node.js engine is not pinned"]);
     assert.strictEqual(compact.supportedCount, 1);
     assert.strictEqual(compact.totalDependencies, 2);

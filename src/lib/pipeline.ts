@@ -48,9 +48,7 @@ function buildCompactSummary(result: PipelineResult): string {
   }
 
   if (breakingChanges.length > 0) {
-    const topRisks = breakingChanges
-      .flatMap((bc) => bc.risks)
-      .slice(0, 3);
+    const topRisks = breakingChanges.flatMap((bc) => bc.risks).slice(0, 3);
     lines.push(`Top risks: ${topRisks.join(" | ")}`);
   }
 
@@ -60,7 +58,9 @@ function buildCompactSummary(result: PipelineResult): string {
     );
   }
 
-  lines.push(`Plan: ${plan.phases.length} phases, ${plan.recommendedTargets.length} targets`);
+  lines.push(
+    `Plan: ${plan.phases.length} phases, ${plan.recommendedTargets.length} targets`,
+  );
 
   return lines.join("\n");
 }
@@ -83,7 +83,7 @@ export async function runUpgradePipeline(
     ? []
     : await scanRepoForDeprecations(rootPath, targets, 50, analysis);
 
-  const plan = await generateUpgradePlan(rootPath, targets);
+  const plan = await generateUpgradePlan(rootPath, targets, analysis);
 
   const result: PipelineResult = {
     analysis,

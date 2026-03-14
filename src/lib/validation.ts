@@ -122,11 +122,7 @@ export async function validateUpgrade(
   const results: ValidationCommandResult[] = [];
 
   for (const kind of include) {
-    const execution = getScriptCommand(
-      kind,
-      packageManager,
-      scripts,
-    );
+    const execution = getScriptCommand(kind, packageManager, scripts);
     if (execution.args.length === 0) {
       results.push({
         kind,

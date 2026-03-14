@@ -69,21 +69,23 @@ describe("applySafeCodemods", () => {
     // Make the file read-only to force a write error
     await fs.chmod(schemaPath, 0o444);
 
-    const result = await applySafeCodemods(
-      path.join(tmpDir, "apply-fail"),
-      "apply",
-    );
+    try {
+      const result = await applySafeCodemods(
+        path.join(tmpDir, "apply-fail"),
+        "apply",
+      );
 
-    // Should report changed: false and include an error message
-    assert.strictEqual(result.changes[0]!.changed, false);
-    assert.ok(
-      typeof result.changes[0]!.error === "string" &&
-        result.changes[0]!.error.length > 0,
-      "error field should contain error message",
-    );
-
-    // Cleanup: restore permissions for after() cleanup
-    await fs.chmod(schemaPath, 0o644);
+      // Should report changed: false and include an error message
+      assert.strictEqual(result.changes[0]!.changed, false);
+      assert.ok(
+        typeof result.changes[0]!.error === "string" &&
+          result.changes[0]!.error.length > 0,
+        "error field should contain error message",
+      );
+    } finally {
+      // Restore permissions so after() cleanup can remove the file
+      await fs.chmod(schemaPath, 0o644);
+    }
   });
 
   it("should list unsupported codemod ids", async () => {

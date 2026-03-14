@@ -1,5 +1,12 @@
-import { exec } from "node:child_process";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import semver from "semver";
+
+const execFileAsync = promisify(execFile);
+
+function getNpmCommand(): string {
+  return process.platform === "win32" ? "npm.cmd" : "npm";
+}
 
 export interface PeerCheckResult {
   package: string;
@@ -14,24 +21,17 @@ interface NpmViewResult {
 }
 
 async function npmView(pkg: string, version: string): Promise<NpmViewResult> {
-  return new Promise((resolve) => {
-    exec(
-      `npm view ${pkg}@${version} peerDependencies --json`,
-      { timeout: 30_000 },
-      (error, stdout) => {
-        if (error || !stdout.trim()) {
-          resolve({});
-          return;
-        }
-        try {
-          const parsed = JSON.parse(stdout);
-          resolve({ peerDependencies: parsed });
-        } catch {
-          resolve({});
-        }
-      },
+  try {
+    const { stdout } = await execFileAsync(
+      getNpmCommand(),
+      ["view", `${pkg}@${version}`, "peerDependencies", "--json"],
+      { timeout: 30_000, windowsHide: true },
     );
-  });
+    if (!stdout.trim()) return {};
+    return { peerDependencies: JSON.parse(stdout) };
+  } catch {
+    return {};
+  }
 }
 
 export async function checkPeerCompatibility(
@@ -47,7 +47,10 @@ export async function checkPeerCompatibility(
 
       for (const [peerName, peerRange] of Object.entries(peers)) {
         const installingVersion = versionMap.get(peerName);
-        if (installingVersion && !semver.satisfies(installingVersion, peerRange)) {
+        if (
+          installingVersion &&
+          !semver.satisfies(installingVersion, peerRange)
+        ) {
           conflicts.push(
             `${peerName}@${installingVersion} does not satisfy ${peerRange}`,
           );

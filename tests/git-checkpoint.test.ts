@@ -59,4 +59,12 @@ describe("git checkpoints", () => {
     const content = await fs.readFile(path.join(tmpDir, "file.txt"), "utf8");
     assert.equal(content, "initial");
   });
+
+  it("should reject labels with shell metacharacters", async () => {
+    tmpDir = await makeTmpRepo();
+    await assert.rejects(
+      () => createCheckpoint(tmpDir, "bad; rm -rf /"),
+      /Invalid checkpoint label/,
+    );
+  });
 });

@@ -4,8 +4,18 @@ import { filterGuidesByVersion } from "../src/lib/breaking-changes.js";
 
 describe("filterGuidesByVersion", () => {
   const guides = [
-    { title: "Migrate 7→8", url: "https://example.com/7-8", fromMajor: 7, toMajor: 8 },
-    { title: "Migrate 8→9", url: "https://example.com/8-9", fromMajor: 8, toMajor: 9 },
+    {
+      title: "Migrate 7→8",
+      url: "https://example.com/7-8",
+      fromMajor: 7,
+      toMajor: 8,
+    },
+    {
+      title: "Migrate 8→9",
+      url: "https://example.com/8-9",
+      fromMajor: 8,
+      toMajor: 9,
+    },
     { title: "General guide", url: "https://example.com/general" },
   ];
 

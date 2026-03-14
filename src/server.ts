@@ -259,7 +259,11 @@ server.registerTool(
   },
   async ({ rootPath, targets, outputFormat }) => {
     try {
-      const result = await detectUpgradePaths(rootPath, targets, cachedAnalysis());
+      const result = await detectUpgradePaths(
+        rootPath,
+        targets,
+        cachedAnalysis(),
+      );
       rememberArtifact("paths", result);
       return asToolResult(
         outputFormat === "compact" ? compactPaths(result) : result,
@@ -284,12 +288,14 @@ server.registerTool(
   },
   async ({ rootPath, targets, outputFormat }) => {
     try {
-      const result = await findBreakingChanges(rootPath, targets, cachedAnalysis());
+      const result = await findBreakingChanges(
+        rootPath,
+        targets,
+        cachedAnalysis(),
+      );
       rememberArtifact("breakingChanges", result);
       return asToolResult(
-        outputFormat === "compact"
-          ? compactBreakingChanges(result)
-          : result,
+        outputFormat === "compact" ? compactBreakingChanges(result) : result,
       );
     } catch (error) {
       return errorResult(error);
@@ -342,7 +348,10 @@ server.registerTool(
   async ({ rootPath, targets }) => {
     try {
       return asToolResult(
-        rememberArtifact("plan", await generateUpgradePlan(rootPath, targets, cachedAnalysis())),
+        rememberArtifact(
+          "plan",
+          await generateUpgradePlan(rootPath, targets, cachedAnalysis()),
+        ),
       );
     } catch (error) {
       return errorResult(error);
@@ -394,7 +403,12 @@ server.registerTool(
   },
   async ({ rootPath, include, timeoutMs, outputFormat, quietOnSuccess }) => {
     try {
-      const result = await validateUpgrade(rootPath, include, timeoutMs, cachedAnalysis());
+      const result = await validateUpgrade(
+        rootPath,
+        include,
+        timeoutMs,
+        cachedAnalysis(),
+      );
       rememberArtifact("validation", result);
       if (quietOnSuccess) return asToolResult(quietValidation(result));
       return asToolResult(
@@ -415,9 +429,7 @@ server.registerTool(
     inputSchema: z.object({
       rootPath: z.string().optional(),
       targets: z.array(z.string()).optional(),
-      skipSteps: z
-        .array(z.enum(["findings", "breakingChanges"]))
-        .optional(),
+      skipSteps: z.array(z.enum(["findings", "breakingChanges"])).optional(),
     }),
   },
   async ({ rootPath, targets, skipSteps }) => {
@@ -449,7 +461,11 @@ server.registerTool(
   },
   async ({ rootPath, targets }) => {
     try {
-      const markdown = await writeUpgradePrSummary(rootPath, targets, cachedAnalysis());
+      const markdown = await writeUpgradePrSummary(
+        rootPath,
+        targets,
+        cachedAnalysis(),
+      );
       rememberArtifact("summary", markdown);
       return asToolResult({ markdown });
     } catch (error) {
@@ -477,11 +493,7 @@ server.registerTool(
   },
   async ({ rootPath, packages }) => {
     try {
-      const result = await installUpgrade(
-        rootPath,
-        packages,
-        cachedAnalysis(),
-      );
+      const result = await installUpgrade(rootPath, packages, cachedAnalysis());
       return asToolResult(result);
     } catch (error) {
       return errorResult(error);
@@ -539,8 +551,7 @@ server.registerTool(
   "restore_checkpoint",
   {
     title: "Restore git checkpoint",
-    description:
-      "Hard-reset to a previously created checkpoint tag.",
+    description: "Hard-reset to a previously created checkpoint tag.",
     inputSchema: z.object({
       rootPath: z.string().optional(),
       label: z.string(),
@@ -568,9 +579,7 @@ server.registerTool(
   },
   async ({ rootPath }) => {
     try {
-      return asToolResult(
-        await listCheckpoints(rootPath ?? process.cwd()),
-      );
+      return asToolResult(await listCheckpoints(rootPath ?? process.cwd()));
     } catch (error) {
       return errorResult(error);
     }

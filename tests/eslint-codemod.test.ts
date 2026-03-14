@@ -20,7 +20,10 @@ describe("eslint-flat-config codemod", () => {
     tmpDir = await makeTmp();
     await fs.writeFile(
       path.join(tmpDir, ".eslintrc.json"),
-      JSON.stringify({ extends: ["eslint:recommended"], rules: { semi: "error" } }),
+      JSON.stringify({
+        extends: ["eslint:recommended"],
+        rules: { semi: "error" },
+      }),
     );
     const result = await applySafeCodemods(tmpDir, "dry-run", [
       "eslint-flat-config",
@@ -51,7 +54,10 @@ describe("eslint-flat-config codemod", () => {
   it("should skip when eslint.config.mjs already exists", async () => {
     tmpDir = await makeTmp();
     await fs.writeFile(path.join(tmpDir, ".eslintrc.json"), "{}");
-    await fs.writeFile(path.join(tmpDir, "eslint.config.mjs"), "export default [];");
+    await fs.writeFile(
+      path.join(tmpDir, "eslint.config.mjs"),
+      "export default [];",
+    );
     const result = await applySafeCodemods(tmpDir, "dry-run", [
       "eslint-flat-config",
     ]);

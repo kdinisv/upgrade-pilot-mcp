@@ -861,8 +861,7 @@ export async function findBreakingChanges(
       const currentMajor = info?.currentMajor ?? null;
       // Determine latest major from the highest toMajor in guides
       const latestGuide = entry.guides.reduce<number | null>(
-        (max, g) =>
-          g.toMajor != null ? Math.max(max ?? 0, g.toMajor) : max,
+        (max, g) => (g.toMajor != null ? Math.max(max ?? 0, g.toMajor) : max),
         null,
       );
       const filteredGuides = filterGuidesByVersion(
