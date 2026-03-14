@@ -2,7 +2,18 @@
   "name": "upgrade-pilot-mcp",
   "version": "0.1.16",
   "description": "Workflow-oriented MCP server for safer JS/TS stack upgrades and migrations.",
+  "license": "MIT",
   "type": "module",
+  "keywords": [
+    "mcp",
+    "upgrade",
+    "migration",
+    "javascript",
+    "typescript",
+    "dependencies",
+    "breaking-changes",
+    "codemod"
+  ],
   "files": [
     "dist",
     "docs",
@@ -20,7 +31,8 @@
     "check": "tsc -p tsconfig.json --noEmit",
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
-    "test": "tsx --test tests/**/*.test.ts"
+    "test": "tsx --test tests/**/*.test.ts",
+    "prepublishOnly": "npm run build"
   },
   "engines": {
     "node": ">=20.11"
