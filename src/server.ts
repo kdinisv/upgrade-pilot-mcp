@@ -29,6 +29,11 @@ import { scanRepoForDeprecations } from "./lib/deprecation-scanner.js";
 import { installUpgrade } from "./lib/installer.js";
 import { checkPeerCompatibility } from "./lib/compatibility.js";
 import {
+  createCheckpoint,
+  listCheckpoints,
+  restoreCheckpoint,
+} from "./lib/git-checkpoint.js";
+import {
   generateUpgradePlan,
   writeUpgradePrSummary,
 } from "./lib/plan-generator.js";
@@ -502,6 +507,70 @@ server.registerTool(
   async ({ packages }) => {
     try {
       return asToolResult(await checkPeerCompatibility(packages));
+    } catch (error) {
+      return errorResult(error);
+    }
+  },
+);
+
+server.registerTool(
+  "create_checkpoint",
+  {
+    title: "Create git checkpoint",
+    description:
+      "Tag current HEAD so the upgrade can be rolled back if needed.",
+    inputSchema: z.object({
+      rootPath: z.string().optional(),
+      label: z.string().default("pre-upgrade"),
+    }),
+  },
+  async ({ rootPath, label }) => {
+    try {
+      return asToolResult(
+        await createCheckpoint(rootPath ?? process.cwd(), label),
+      );
+    } catch (error) {
+      return errorResult(error);
+    }
+  },
+);
+
+server.registerTool(
+  "restore_checkpoint",
+  {
+    title: "Restore git checkpoint",
+    description:
+      "Hard-reset to a previously created checkpoint tag.",
+    inputSchema: z.object({
+      rootPath: z.string().optional(),
+      label: z.string(),
+    }),
+  },
+  async ({ rootPath, label }) => {
+    try {
+      return asToolResult(
+        await restoreCheckpoint(rootPath ?? process.cwd(), label),
+      );
+    } catch (error) {
+      return errorResult(error);
+    }
+  },
+);
+
+server.registerTool(
+  "list_checkpoints",
+  {
+    title: "List git checkpoints",
+    description: "List all upgrade-pilot checkpoint tags in the repository.",
+    inputSchema: z.object({
+      rootPath: z.string().optional(),
+    }),
+  },
+  async ({ rootPath }) => {
+    try {
+      return asToolResult(
+        await listCheckpoints(rootPath ?? process.cwd()),
+      );
     } catch (error) {
       return errorResult(error);
     }
